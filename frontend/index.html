@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BrandTURN | Grow+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg-color: #0A192F;
+        --content-bg: #172A45;
+        --text-dark: #E2E8F0; /* Re-purposed for light text */
+        --text-light: #8892B0; /* Re-purposed for dimmer light text */
+        --accent-color: #FFBF00;
+        --accent-dark: #0A192F; /* For text on yellow buttons */
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-dark);
+        overflow-x: hidden;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+       .font-brand {
+        font-family: 'Orbitron', sans-serif;
+      }
+      .glassmorphism {
+        background: rgba(23, 42, 69, 0.6); /* Darker glass effect */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .accent-text {
+        color: var(--accent-color);
+      }
+      .accent-bg {
+        background-color: var(--accent-color);
+      }
+      header.is-sticky {
+        background-color: rgba(10, 25, 47, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+
+      /* Marquee Animation */
+      @keyframes marquee {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-100%); }
+      }
+
+      .marquee-container {
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        -webkit-mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+        mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+      }
+
+      .marquee-content {
+        display: flex;
+        animation: marquee 120s linear infinite;
+        will-change: transform;
+      }
+
+      .marquee-container:hover .marquee-content {
+        animation-play-state: paused;
+      }
+
+
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.24",
+    "gsap/": "https://aistudiocdn.com/gsap@^3.13.0/",
+    "gsap": "https://aistudiocdn.com/gsap@^3.13.0",
+    "lenis": "https://aistudiocdn.com/lenis@^1.3.15"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

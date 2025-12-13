@@ -1,0 +1,99 @@
+/* From Uiverse.io by adamgiebl */ 
+.get-started-btn {
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 17px;
+  padding: 0.8em 1.3em 0.8em 0.9em;
+  color: white;
+  background: #00A676;
+  background: linear-gradient(to right, #00A676, #EA9010, #BC2C1A);
+  border: none;
+  letter-spacing: 0.05em;
+  border-radius: 16px;
+}
+
+button svg {
+  margin-right: 3px;
+  transform: rotate(30deg);
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+button span {
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+button:hover svg {
+  transform: translateX(5px) rotate(90deg);
+}
+
+button:hover span {
+  transform: translateX(7px);
+}
+
+
+
+/* ---------------- Luxury Branding Hero Theme (Option C) ---------------- */
+
+.hero-title {
+  color: #F7F9F9;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.hero-subtitle {
+  color: #D9E2EC;
+  opacity: 0.9;
+  line-height: 1.6;
+  text-shadow: 0 3px 18px rgba(0,0,0,0.35);
+}
+
+.hero-lux-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      circle at 20% 30%,
+      rgba(255,255,255,0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(234,144,16,0.10),
+      transparent 65%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(0,166,118,0.10),
+      transparent 70%
+    );
+  mix-blend-mode: screen;
+}
+
+.hero-glow {
+  box-shadow: 0 0 40px rgba(234,144,16,0.25),
+              0 0 90px rgba(0,166,118,0.25);
+  border-radius: 24px;
+}
+
+/* Buttons matching luxury theme */
+.get-started-btn {
+  background: linear-gradient(
+    to right,
+    #00A676 0%,
+    #EA9010 35%,
+    #BC2C1A 100%
+  );
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4),
+              0 0 24px rgba(234,144,16,0.35);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.get-started-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.5),
+              0 0 32px rgba(234,144,16,0.45);
+}
