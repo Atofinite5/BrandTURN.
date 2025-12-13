@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/fraunces": "^5.2.9",
     "@fontsource/space-grotesk": "^5.2.10",
     "@fontsource/syne": "^5.2.7",
     "@react-oauth/google": "^0.12.2",
