@@ -36,9 +36,10 @@ This guide will help you publish your website to `brandturn.co.in`.
     *   **Build Command**: `npm install && npm run build`
     *   **Start Command**: `npm start`
 5.  **Environment Variables** (Scroll down to "Advanced"):
-    *   Add `JWT_SECRET`: `your_secret_key_here` (Use a strong random string)
-    *   Add `NODE_ENV`: `production`
-    *   (Optional) `MONGO_URI`: If you want to override the hardcoded one.
+    *   `JWT_SECRET`: `your_secret_key_here` (Use a strong random string)
+    *   `NODE_ENV`: `production`
+    *   `MONGO_URI`: `your_mongodb_connection_string` (Required for security)
+    *   `FRONTEND_URL`: `https://your-frontend-app.vercel.app` (Add this after deploying frontend)
 6.  Click **Create Web Service**.
 7.  Wait for the deployment to finish. Copy the **Service URL** (e.g., `https://brandturn-backend.onrender.com`).
 
@@ -48,6 +49,12 @@ This guide will help you publish your website to `brandturn.co.in`.
 2.  Click **Add New...** -> **Project**.
 3.  Import your GitHub repository.
 4.  **Project Settings**:
+    *   **Framework Preset**: Vite
+    *   **Root Directory**: `frontend` (Click "Edit" next to Root Directory and select `frontend`)
+5.  **Environment Variables**:
+    *   `VITE_API_URL`: `https://brandturn-backend.onrender.com` (The URL from Step 2)
+    *   `GEMINI_API_KEY`: `your_gemini_api_key`
+6.  Click **Deploy**.
     *   **Framework Preset**: Vite (should be detected automatically).
     *   **Root Directory**: Click "Edit" and select `frontend`.
 5.  **Environment Variables**:

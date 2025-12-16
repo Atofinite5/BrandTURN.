@@ -1,0 +1,145 @@
+/* Luxury Theme Variables */
+:root {
+  --gold-primary: #D4AF37;
+  --gold-dark: #B38F1D;
+  --bg-input: #141414;
+  --border-base: #333333;
+  --border-hover: #444444;
+  --border-focus: rgba(212, 175, 55, 0.5);
+  --shadow-gold: rgba(212, 175, 55, 0.2);
+  --text-placeholder: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   Luxury Input Component
+   ========================================= */
+.luxury-input-group {
+  position: relative;
+  width: 100%;
+}
+
+.luxury-input-icon-wrapper {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  pointer-events: none;
+  transition: color 300ms ease;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.luxury-input-group:hover .luxury-input-icon-wrapper {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.luxury-input-group.focused .luxury-input-icon-wrapper {
+  color: var(--gold-primary);
+}
+
+.luxury-input-field {
+  width: 100%;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-base);
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.875rem 1rem 0.875rem 3rem; /* py-3.5 pl-12 pr-4 */
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 300;
+  letter-spacing: 0.025em;
+  position: relative;
+  z-index: 10;
+  outline: none;
+  transition: all 300ms ease;
+}
+
+.luxury-input-field::placeholder {
+  color: var(--text-placeholder);
+}
+
+.luxury-input-field:hover {
+  border-color: var(--border-hover);
+}
+
+.luxury-input-field:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 15px -5px var(--shadow-gold);
+}
+
+/* =========================================
+   Luxury Button Component
+   ========================================= */
+.luxury-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  font-size: 0.875rem;
+  transition: all 300ms ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.luxury-btn.w-full {
+  width: 100%;
+}
+
+/* Primary Variant */
+.luxury-btn-primary {
+  background: linear-gradient(to bottom, var(--gold-primary), var(--gold-dark));
+  color: black;
+  border: none;
+  box-shadow: 0 4px 20px -5px rgba(212, 175, 55, 0.4);
+}
+
+.luxury-btn-primary:hover {
+  box-shadow: 0 6px 25px -5px rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Outline Variant */
+.luxury-btn-outline {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.luxury-btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Ghost Variant */
+.luxury-btn-ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+}
+
+.luxury-btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--gold-primary);
+}
+
+/* Shine Effect Logic */
+.luxury-btn-shine-layer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+  pointer-events: none;
+}
+
+.luxury-btn:hover .luxury-btn-shine-layer {
+  left: 200%;
+  transition: left 0.75s ease-in-out;
+}

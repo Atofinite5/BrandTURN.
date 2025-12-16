@@ -105,6 +105,14 @@ const Hero = ({ onAuthClick }: HeroProps) => {
                 >
                     Elevate your digital presence with cutting-edge design, immersive experiences, and strategic branding that leaves a lasting impact.
                 </p>
+
+                <div className="pointer-events-auto" style={{ transform: 'translateZ(40px)' }}>
+                    {!user && (
+                        <SpotlightButton onClick={onAuthClick} className="px-8 py-4 text-lg font-bold rounded-full">
+                            Start Your Journey
+                        </SpotlightButton>
+                    )}
+                </div>
             </div>
 
             {/* Scroll Indicator */}

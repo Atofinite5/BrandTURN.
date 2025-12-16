@@ -1,8 +1,51 @@
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { useState } from 'react';
+import { Mail, MapPin, Phone, Lock } from 'lucide-react';
 import SpotlightButton from '../ui/SpotlightButton';
 import Squares from '../ui/Squares';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import AuthModal from '../AuthModal';
 
 const Contact = () => {
+    const { user } = useAuth();
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
+    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+        
+        setStatus('sending');
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await axios.post(`${API_URL}/api/contacts`, formData, config);
+            setStatus('success');
+            setFormData({ name: '', email: '', subject: '', message: '' });
+            setTimeout(() => setStatus('idle'), 3000);
+        } catch (error) {
+            setStatus('error');
+            setTimeout(() => setStatus('idle'), 3000);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     return (
         <section id="contact" className="py-32 bg-zinc-950 relative overflow-hidden">
             <div className="absolute inset-0 z-0">
@@ -37,8 +80,8 @@ const Contact = () => {
                                     <Mail size={20} />
                                 </div>
                                 <div>
-                                    <a href="mailto:support@brandturn.co.in" className="text-sm text-gray-500">Email us</a>
-                                    <p className="font-medium">https://brandturn.co.in/</p>
+                                    <p className="text-sm text-gray-500">Email us</p>
+                                    <a href="mailto:Supriya.honest@gmail.com" className="font-medium hover:text-primary transition-colors">core@brandturn.com</a>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4 text-gray-300">
@@ -62,13 +105,33 @@ const Contact = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-sm">
-                        <form className="space-y-6">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-sm relative overflow-hidden">
+                        {!user && (
+                            <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                                    <Lock className="w-8 h-8 text-white/50" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Members Only</h3>
+                                <p className="text-gray-400 mb-6 max-w-xs">Please sign in to contact our team and start your project.</p>
+                                <button 
+                                    onClick={() => setIsAuthModalOpen(true)}
+                                    className="px-8 py-3 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition-colors"
+                                >
+                                    Sign In to Connect
+                                </button>
+                            </div>
+                        )}
+                        
+                        <form onSubmit={handleSubmit} className={`space-y-6 ${!user ? 'opacity-20 pointer-events-none' : ''}`}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-400">Name</label>
                                     <input
                                         type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
                                         className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
                                         placeholder="John Doe"
                                     />
@@ -77,6 +140,10 @@ const Contact = () => {
                                     <label className="text-sm font-medium text-gray-400">Email</label>
                                     <input
                                         type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
                                         className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
                                         placeholder="john@example.com"
                                     />
@@ -86,6 +153,10 @@ const Contact = () => {
                                 <label className="text-sm font-medium text-gray-400">Subject</label>
                                 <input
                                     type="text"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    required
                                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
                                     placeholder="Project Inquiry"
                                 />
@@ -94,13 +165,21 @@ const Contact = () => {
                                 <label className="text-sm font-medium text-gray-400">Message</label>
                                 <textarea
                                     rows={4}
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    required
                                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors resize-none"
                                     placeholder="Tell us about your project..."
                                 />
                             </div>
-                            <SpotlightButton variant="primary" className="w-full font-[trebuchet ms] font-bold text-base md:text-lg uppercase tracking-wide] text-white white-space-nowrap">
-                                Send Message
-                            </SpotlightButton>
+                            <button 
+                                type="submit"
+                                disabled={status === 'sending'}
+                                className="w-full relative px-8 py-4 rounded-full font-bold text-lg overflow-hidden transition-all duration-300 flex items-center justify-center gap-2 group bg-primary text-black hover:shadow-[0_0_20px_rgba(252,163,17,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {status === 'sending' ? 'Sending...' : status === 'success' ? 'Message Sent!' : status === 'error' ? 'Error. Try Again.' : 'Send Message'}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -113,6 +192,8 @@ const Contact = () => {
                     </div>
                 </div>
             </div>
+            
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         </section>
     );
 };
