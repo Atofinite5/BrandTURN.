@@ -7,6 +7,7 @@ export interface IUser extends Document {
     password?: string;
     googleId?: string;
     avatar?: string;
+    isAdmin: boolean;
     matchPassword: (enteredPassword: string) => Promise<boolean>;
 }
 
@@ -30,11 +31,26 @@ const UserSchema: Schema = new Schema(
         avatar: {
             type: String,
         },
+        isAdmin: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
     },
     {
         timestamps: true,
     }
 );
+
+export interface IUser extends Document {
+    name: string;
+    email: string;
+    password?: string;
+    googleId?: string;
+    avatar?: string;
+    isAdmin: boolean;
+    matchPassword: (enteredPassword: string) => Promise<boolean>;
+}
 
 // Encrypt password using bcrypt
 UserSchema.pre<IUser>('save', async function (next) {

