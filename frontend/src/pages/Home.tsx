@@ -7,6 +7,7 @@ import About from '../components/sections/About';
 import Services from '../components/sections/Services';
 import Clients from '../components/sections/Clients';
 import Contact from '../components/sections/Contact';
+import FAQ from '../components/sections/FAQ';
 import AuthModal from '../components/AuthModal';
 
 const Home = () => {
@@ -39,6 +40,7 @@ const Home = () => {
           <About />
           <Services />
           <Clients />
+          <FAQ />
           <Contact />
         </main>
         <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
