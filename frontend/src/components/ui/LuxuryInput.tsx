@@ -22,7 +22,7 @@ export const LuxuryInput: React.FC<LuxuryInputProps> = ({ label, icon, className
         className={`w-full bg-[#141414] border ${isFocused 
             ? 'border-[#D4AF37]/50 shadow-[0_0_15px_-5px_rgba(212,175,55,0.2)]' 
             : 'border-[#333] hover:border-[#444]'
-        }h-12 px-4 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none transition-all duration-300 font-light tracking-wide text-sm relative z-10 `}
+        } h-12 px-4 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/30 focus:outline-none transition-all duration-200 font-light tracking-wide text-sm relative z-10`}
         placeholder={props.placeholder || label}
         onFocus={(e) => {
           setIsFocused(true);

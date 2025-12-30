@@ -26,7 +26,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
     const { login, register, googleLogin, error } = useAuth();
 
-    // Entrance Animation
+    // Entrance Animation - Optimized for speed
     useLayoutEffect(() => {
         if (!isOpen) return;
         
@@ -34,23 +34,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             // Overlay fade in
             gsap.fromTo(overlayRef.current, 
                 { opacity: 0 }, 
-                { opacity: 1, duration: 0.4, ease: "power2.out" }
+                { opacity: 1, duration: 0.2, ease: "power2.out" }
             );
 
             // Modal scale and fade
             gsap.fromTo(modalRef.current,
-                { scale: 0.95, opacity: 0, y: 20 },
-                { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 }
+                { scale: 0.98, opacity: 0, y: 10 },
+                { scale: 1, opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
             );
 
             // Stagger elements
             gsap.from(".auth-stagger", {
-                y: 20,
+                y: 10,
                 opacity: 0,
-                duration: 0.5,
-                stagger: 0.05,
+                duration: 0.25,
+                stagger: 0.03,
                 ease: "power2.out",
-                delay: 0.3
+                delay: 0.1
             });
 
         }, containerRef);
@@ -72,8 +72,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
             tl.to(pillRef.current, {
                 xPercent: isLogin ? 0 : 100,
-                duration: 0.55,
-                ease: "expo.out"
+                duration: 0.35,
+                ease: "power3.out"
             });
 
             // Animate form height and content
@@ -81,13 +81,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             
             formTl.to(".form-content", {
                 opacity: 0,
-                y: 10,
-                duration: 0.2,
+                y: 5,
+                duration: 0.15,
             })
             .to(".form-content", {
                 opacity: 1,
                 y: 0,
-                duration: 0.3,
+                duration: 0.2,
                 clearProps: "all"
             });
 
@@ -140,11 +140,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
                     {/* Header */}
                     <div className="text-center mb-8 auth-stagger">
-                        <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
-                            {isLogin ? 'Welcome Back' : 'Join the Elite'}
+                        <h2 className="text-3xl font-semibold text-white mb-3 tracking-tight font-display">
+                            {isLogin ? 'Welcome Back' : 'Join Us'}
                         </h2>
-                        <p className="text-white/40 text-sm font-medium tracking-wide">
-                            {isLogin ? 'Access your luxury dashboard' : 'Begin your journey with us'}
+                        <p className="text-white/50 text-base font-light tracking-wide leading-relaxed">
+                            {isLogin ? 'Continue to your dashboard' : 'Start your digital transformation'}
                         </p>
                     </div>
 
@@ -156,20 +156,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         />
                         <button
                             onClick={() => setIsLogin(true)}
-                            className={`relative z-10 flex-1 py-2.5 text-sm font-semibold transition-colors duration-300 ${isLogin ? 'text-white' : 'text-white/40 hover:text-white/60'}`}
+                            className={`relative z-10 flex-1 py-3 text-sm font-medium tracking-wide transition-all duration-200 ${isLogin ? 'text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                             Sign In
                         </button>
                         <button
                             onClick={() => setIsLogin(false)}
-                            className={`relative z-10 flex-1 py-2.5 text-sm font-semibold transition-colors duration-300 ${!isLogin ? 'text-white' : 'text-white/40 hover:text-white/60'}`}
+                            className={`relative z-10 flex-1 py-3 text-sm font-medium tracking-wide transition-all duration-200 ${!isLogin ? 'text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                             Sign Up
                         </button>
                     </div>
 
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl mb-6 text-sm text-center auth-stagger">
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-6 text-sm font-medium text-center auth-stagger leading-relaxed">
                             {error}
                         </div>
                     )}
@@ -226,8 +226,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-white/10"></div>
                         </div>
-                        <div className="relative flex justify-center text-[10px] uppercase tracking-[0.2em]">
-                            <span className="px-4 bg-[#0A0A0A] text-white/30">Or continue with</span>
+                        <div className="relative flex justify-center text-[11px] uppercase tracking-[0.25em] font-medium">
+                            <span className="px-4 bg-[#0A0A0A] text-white/40">Or continue with</span>
                         </div>
                     </div>
 

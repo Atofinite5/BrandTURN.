@@ -12,11 +12,11 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
     const { user, logout } = useAuth();
     
     // Button spotlight state
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const buttonRef = useRef<HTMLAnchorElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [opacity, setOpacity] = useState(0);
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!buttonRef.current) return;
         const rect = buttonRef.current.getBoundingClientRect();
         setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
@@ -57,12 +57,12 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
                     }`}
                 >
                     {/* Logo */}
-                    <a href="#" className="text-2xl font-bold tracking-tight font-display uppercase">
-                        Brand<span className="text-[var(--color-primary)]">TURN</span>
+                    <a href="#" className="text-2xl font-bold tracking-tight font-display">
+                        <span className="text-white">Brand</span><span className="text-[var(--color-primary)]">TURN</span>
                     </a>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => (
                             <a
                                 key={link.name}
@@ -87,9 +87,9 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
                                 </button>
                             </div>
                         ) : (
-                            <button
+                            <a
+                                href="#contact"
                                 ref={buttonRef}
-                                onClick={onAuthClick}
                                 onMouseMove={handleMouseMove}
                                 onMouseLeave={handleMouseLeave}
                                 className="relative overflow-hidden transition-all duration-500 flex items-center justify-center gap-2 group bg-black text-white border border-white/20 hover:border-white hover:bg-white hover:text-black px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase"
@@ -100,14 +100,14 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
                                         background: `radial-gradient(600px at ${position.x}px ${position.y}px, rgba(255, 255, 255, 0.4), transparent 40%)`
                                     }}
                                 />
-                                <span className="relative z-10 flex items-center gap-2">Sign Up</span>
-                            </button>
+                                <span className="relative z-10 flex items-center gap-2">Contact Us</span>
+                            </a>
                         )}
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden text-white p-2"
+                        className="md:hidden text-white p-2 "
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X /> : <Menu />}
@@ -128,15 +128,13 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
                             {link.name}
                         </a>
                     ))}
-                    <button
-                        onClick={() => {
-                            onAuthClick();
-                            setIsMenuOpen(false);
-                        }}
-                        className="w-full py-3 rounded-full bg-white text-black font-bold mt-4"
+                    <a
+                        href="#contact"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="w-full py-3 rounded-full bg-white text-black font-bold mt-4 text-center block"
                     >
-                        Sign Up
-                    </button>
+                        Contact Us
+                    </a>
                 </div>
             )}
         </nav>

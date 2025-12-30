@@ -14,7 +14,7 @@ export const LuxuryButton: React.FC<LuxuryButtonProps> = ({
   ...props 
 }) => {
   const widthClass = fullWidth ? 'w-full' : '';
-  const baseClass = `relative group overflow-hidden py-3.5 px-6 rounded-xl transition-all duration-300 font-medium tracking-wide text-sm ${widthClass} ${className}`;
+  const baseClass = `relative group overflow-hidden py-4 px-6 rounded-xl transition-all duration-200 font-medium tracking-wide text-[15px] ${widthClass} ${className}`;
 
   if (variant === 'white-pill') {
     return (
