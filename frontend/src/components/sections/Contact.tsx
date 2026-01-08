@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Mail, MapPin, Phone, ChevronDown, Check } from 'lucide-react';
-import axios from 'axios';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -17,6 +16,7 @@ const Contact = () => {
         message: ''
     });
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const countries = [
         'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
@@ -32,57 +32,84 @@ const Contact = () => {
         'Search Ads', 'Social Media', 'Display & Native', 'Programmatic Buying', 'Other'
     ];
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Prevent double submission
+        if (status === 'sending') return;
+        
         setStatus('sending');
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-            const config = {};
-            await axios.post(`${API_URL}/api/contacts`, {
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
-                subject: `Inquiry from ${formData.companyName}`,
-                message: `
-                    Phone: ${formData.phone}
-                    Country: ${formData.country}
-                    Company: ${formData.companyName}
-                    Website: ${formData.companyWebsite}
-                    Company Size: ${formData.companySize}
-                    Advertises On: ${formData.advertiseOn.join(', ')}
-                    Message: ${formData.message}
-                `
-            }, config);
-            setStatus('success');
-            setFormData({ 
-                firstName: '', lastName: '', email: '', phone: '', 
-                country: '', companyName: '', companyWebsite: '', 
-                companySize: '', advertiseOn: [], agreeToMarketing: false, message: '' 
-            });
-            setTimeout(() => setStatus('idle'), 3000);
-        } catch (error) {
-            setStatus('error');
-            setTimeout(() => setStatus('idle'), 3000);
-        }
-    };
+        setErrorMessage('');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+        
+        const payload = {
+            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            email: formData.email,
+            subject: formData.companyName ? `Inquiry from ${formData.companyName}` : 'New Contact Inquiry',
+            message: `Phone: ${formData.phone || 'N/A'}
+Country: ${formData.country}
+Company: ${formData.companyName}
+Website: ${formData.companyWebsite || 'N/A'}
+Company Size: ${formData.companySize}
+Advertises On: ${formData.advertiseOn.join(', ') || 'N/A'}
+Message: ${formData.message || 'N/A'}`,
+            type: 'Business'
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/api/contacts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setStatus('success');
+                // Reset form
+                setFormData({ 
+                    firstName: '', lastName: '', email: '', phone: '', 
+                    country: '', companyName: '', companyWebsite: '', 
+                    companySize: '', advertiseOn: [], agreeToMarketing: false, message: '' 
+                });
+                setTimeout(() => setStatus('idle'), 4000);
+            } else {
+                throw new Error(data.message || 'Submission failed');
+            }
+        } catch (error: any) {
+            console.error('Contact form error:', error);
+            setStatus('error');
+            setErrorMessage(error.message || 'Something went wrong. Please try again.');
+            setTimeout(() => {
+                setStatus('idle');
+                setErrorMessage('');
+            }, 4000);
+        }
+    }, [formData, status]);
+
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
             if (name === 'agreeToMarketing') {
-                setFormData({ ...formData, agreeToMarketing: checked });
+                setFormData(prev => ({ ...prev, agreeToMarketing: checked }));
             } else {
                 // Handle advertiseOn checkboxes
-                if (checked) {
-                    setFormData({ ...formData, advertiseOn: [...formData.advertiseOn, value] });
-                } else {
-                    setFormData({ ...formData, advertiseOn: formData.advertiseOn.filter(item => item !== value) });
-                }
+                setFormData(prev => ({
+                    ...prev,
+                    advertiseOn: checked 
+                        ? [...prev.advertiseOn, value]
+                        : prev.advertiseOn.filter(item => item !== value)
+                }));
             }
         } else {
-            setFormData({ ...formData, [name]: value });
+            setFormData(prev => ({ ...prev, [name]: value }));
         }
-    };
+    }, []);
 
     return (
         <section id="contact" className="relative pt-10 pb-12 md:pb-16 overflow-hidden" style={{ backgroundColor: '#e8e4dc' }}>
@@ -303,9 +330,15 @@ const Contact = () => {
                             <div className="pt-6">
                                 <button 
                                     type="submit"
-                                    disabled={status === 'sending'}
-                                    className="w-full py-4 rounded-full font-bold text-lg text-white transition-all duration-300 hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                                    style={{ backgroundColor: '#1a4d4d' }}
+                                    disabled={status === 'sending' || status === 'success'}
+                                    className={`w-full py-4 rounded-full font-bold text-lg text-white transition-all duration-300 disabled:cursor-not-allowed ${
+                                        status === 'success' 
+                                            ? 'bg-green-600 hover:bg-green-600' 
+                                            : status === 'error'
+                                            ? 'bg-red-600 hover:bg-red-700'
+                                            : 'hover:shadow-lg hover:scale-[1.02]'
+                                    } ${status === 'sending' ? 'opacity-80' : ''}`}
+                                    style={{ backgroundColor: status === 'success' ? '#16a34a' : status === 'error' ? '#dc2626' : '#1a4d4d' }}
                                 >
                                     {status === 'sending' ? (
                                         <span className="flex items-center justify-center gap-2">
@@ -321,11 +354,14 @@ const Contact = () => {
                                             Submitted Successfully!
                                         </span>
                                     ) : status === 'error' ? (
-                                        'Error. Please try again.'
+                                        <span>{errorMessage || 'Error. Please try again.'}</span>
                                     ) : (
                                         'Submit'
                                     )}
                                 </button>
+                                {status === 'error' && errorMessage && (
+                                    <p className="text-red-600 text-sm text-center mt-2">{errorMessage}</p>
+                                )}
                             </div>
                         </form>
                     </div>

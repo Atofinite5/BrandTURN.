@@ -108,11 +108,7 @@ const Hero = ({ onAuthClick }: HeroProps) => {
                 </p>
 
                 <div className="pointer-events-auto" style={{ transform: 'translateZ(40px)' }}>
-                    {!user && (
-                        <SpotlightButton onClick={onAuthClick} className="px-8 py-4 text-lg font-bold rounded-full">
-                            Start Your Journey
-                        </SpotlightButton>
-                    )}
+          
                 </div>
             </div>
 

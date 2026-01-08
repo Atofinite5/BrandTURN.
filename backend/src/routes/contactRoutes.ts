@@ -4,26 +4,40 @@ import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-// POST /api/contacts - Create a new contact
-router.post('/', protect, async (req, res) => {
+// POST /api/contacts - Create a new contact (PUBLIC - no auth required)
+router.post('/', async (req, res) => {
   try {
     const { name, email, subject, message, city, region, type } = req.body;
     
-    // Simple logic to infer type/city if not provided (mocking geo-location for now)
+    // Validate required fields
+    if (!name || !email || !subject) {
+      return res.status(400).json({ message: 'Name, email, and subject are required' });
+    }
+
+    // Determine inquiry type based on subject/message content
+    let inferredType = type || 'General';
+    const lowerSubject = (subject + ' ' + message).toLowerCase();
+    if (lowerSubject.includes('business') || lowerSubject.includes('partnership') || lowerSubject.includes('company')) {
+      inferredType = 'Business';
+    } else if (lowerSubject.includes('support') || lowerSubject.includes('help') || lowerSubject.includes('issue')) {
+      inferredType = 'Support';
+    }
+
     const newContact = new Contact({
       name,
       email,
       subject,
-      message,
-      city: city || 'Mumbai', // Default for demo
-      region: region || 'Maharashtra', // Default for demo
-      type: type || 'General'
+      message: message || '',
+      city: city || 'Unknown',
+      region: region || 'Unknown',
+      type: inferredType
     });
 
     await newContact.save();
-    res.status(201).json(newContact);
+    res.status(201).json({ success: true, message: 'Contact submitted successfully', contact: newContact });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Contact submission error:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit contact', error });
   }
 });
 
