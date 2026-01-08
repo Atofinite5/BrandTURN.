@@ -1,41 +1,61 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Instagram, Linkedin, Twitter, Facebook, Mail, Phone, MapPin, ArrowUpRight, Send } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Instagram, Linkedin, Twitter, Mail, Phone, MapPin, ArrowUpRight, Send } from 'lucide-react';
+import AccessibilityPanel from '../ui/AccessibilityPanel';
 
 const Footer = () => {
+  const [isAccessPanelOpen, setIsAccessPanelOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleScrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const elementId = href.replace('#', '');
+      
+      if (location.pathname !== '/') {
+        navigate(`/${href}`); // Navigate to home with hash (e.g., /#contact)
+      } else {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
   const footerLinks = {
     services: [
-      { name: 'Brand Identity', href: '#services' },
-      { name: 'Social Media', href: '#services' },
-      { name: 'Web Design', href: '#services' },
-      { name: 'Marketing Strategy', href: '#services' },
-      { name: 'Content Creation', href: '#services' },
+      { name: 'Brand Identity', href: '#contact' },
+      { name: 'Social Media', href: '#contact' },
+      { name: 'Web Design', href: '#contact' },
+      { name: 'Marketing Strategy', href: '#contact' },
+      { name: 'Content Creation', href: '#contact' },
     ],
     company: [
-      { name: 'About Us', href: '#about' },
-      { name: 'Our Work', href: '#clients' },
+      { name: 'Our Work', href: '#services' },
       { name: 'Contact', href: '#contact' },
       { name: 'Careers', href: '/careers' },
-      { name: 'Blog', href: '/blog' },
+      { name: 'Blog', href: 'https://www.instagram.com/_brandturn' },
     ],
     legal: [
       { name: 'Privacy Policy', href: '/privacy' },
       { name: 'Terms of Use', href: '/terms' },
-      { name: 'Cookie Policy', href: '/cookies' },
     ],
   };
 
   const socialLinks = [
-    { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-    { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
+    { icon: Instagram, href: 'https://www.instagram.com/_brandturn', label: 'Instagram' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/brandturn/', label: 'LinkedIn' },
+    { icon: Twitter, href: 'https://x.com/_brandturn?s=20', label: 'Twitter' },
   ];
+
+  const isCareersPage = location.pathname === '/careers';
 
   return (
     <footer className="relative bg-gradient-to-b from-[#0a0a0a] to-[#050505]">
       {/* Curved Top Section - U shape curving up from corners */}
-      <div className="w-full" style={{ backgroundColor: '#e8e4dc' }}>
+      <div className="w-full" style={{ backgroundColor: isCareersPage ? '#050505' : '#e8e4dc' }}>
         <svg
           className="relative block w-full"
           style={{ height: '60px' }}
@@ -60,21 +80,20 @@ const Footer = () => {
 
       {/* Main Footer Content */}
       <div className="relative z-10 pt-8 md:pt-12">
-        {/* Large Brand Name Watermark */}
-        <div className="container mx-auto px-6 mb-8">
-          <div className="text-center overflow-hidden">
-            <h2 className="text-[60px] md:text-[120px] lg:text-[160px] font-bold text-transparent bg-clip-text bg-gradient-to-b from-white/[0.08] to-transparent font-display tracking-tighter select-none leading-none">
-              BRANDTURN
-            </h2>
-          </div>
-        </div>
-
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
             {/* Brand Column */}
             <div className="lg:col-span-4">
+              {/* Brandturn Logo - Bt. */}
+              <div className="mb-6">
+                <img 
+                  src="/assets/images/brandturn.co.in.png" 
+                  alt="Brandturn Logo" 
+                  className="w-32 h-32 md:w-40 md:h-40 object-contain"
+                />
+              </div>
               <Link to="/" className="inline-block mb-6 group">
-                <span className="font-bold text-3xl text-white uppercase tracking-tight font-display transition-colors">
+                <span className="font-bold text-3xl text-white tracking-tight font-display transition-colors">
                   Brand<span className="text-primary group-hover:text-white transition-colors">TURN</span>
                 </span>
               </Link>
@@ -109,13 +128,14 @@ const Footer = () => {
               <ul className="space-y-3">
                 {footerLinks.services.map((link, index) => (
                   <li key={link.name}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
+                      onClick={(e) => handleScrollToSection(e, link.href)}
                       className="group flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 text-sm"
                     >
                       <span className="w-0 h-px bg-primary group-hover:w-3 transition-all duration-300" />
                       <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -130,13 +150,26 @@ const Footer = () => {
               <ul className="space-y-3">
                 {footerLinks.company.map((link) => (
                   <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="group flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 text-sm"
-                    >
-                      <span className="w-0 h-px bg-primary group-hover:w-3 transition-all duration-300" />
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
-                    </Link>
+                    {link.href.startsWith('http') ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 text-sm"
+                      >
+                         <span className="w-0 h-px bg-primary group-hover:w-3 transition-all duration-300" />
+                         <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        onClick={(e) => handleScrollToSection(e, link.href)}
+                        className="group flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 text-sm"
+                      >
+                        <span className="w-0 h-px bg-primary group-hover:w-3 transition-all duration-300" />
+                        <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -204,12 +237,31 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-6">
                 <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Sitemap</a>
-                <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Accessibility</a>
+                <button 
+                   onClick={() => {
+                     localStorage.removeItem('cookieConsent');
+                     window.location.reload();
+                   }}
+                   className="text-gray-500 hover:text-white text-sm transition-colors"
+                >
+                  Cookies
+                </button>
+                <button 
+                  onClick={() => setIsAccessPanelOpen(true)}
+                  className="text-gray-500 hover:text-white text-sm transition-colors focus:outline-none"
+                >
+                  Accessibility
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <AccessibilityPanel 
+        isOpen={isAccessPanelOpen} 
+        onClose={() => setIsAccessPanelOpen(false)} 
+      />
 
       {/* Bottom Glow Effect */}
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />

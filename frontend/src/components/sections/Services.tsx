@@ -56,12 +56,19 @@ const Services = () => {
 
             <div className="container mx-auto px-6 relative z-10 pt-24">
                 {/* Header */}
-                <div className="mb-8 text-center">
+                <div className="mb-8 text-center flex flex-col items-center">
+                    <div className="mb-6">
+                        <img 
+                            src="/assets/images/brandturn.co.in.png" 
+                            alt="Brandturn Logo" 
+                            className="w-24 h-24 object-contain"
+                        />
+                    </div>
                     <span className="text-white/60 font-medium tracking-[0.3em] uppercase text-sm mb-2 block">
                         BRANDTURN
                     </span>
                     <h2 className="text-4xl md:text-5xl font-display font-bold text-white">
-                        SOCIAL MEDIA
+                        SERVICES
                     </h2>
                 </div>
             </div>

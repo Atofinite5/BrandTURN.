@@ -2,23 +2,16 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 const logos = [
-    { name: 'AuraBloom Cosmetics', src: '/assets/logos/AuraBloomCosmetics.png' },
-    { name: 'BloodConnect Foundation', src: '/assets/logos/BloodConnectFoundation.png' },
-    { name: 'CloudNova Systems', src: '/assets/logos/CloudNovaSystems.png' },
-    { name: 'FrameFox Productions', src: '/assets/logos/FrameFoxProductions.png' },
-    { name: 'GreenGlobe Foundation', src: '/assets/logos/GreenGlobeFoundation.png' },
-    { name: 'Hindrise Corp', src: '/assets/logos/HindriseCorp.png' },
-    { name: 'LambdaSphere AI', src: '/assets/logos/LambdaSphereAI.png' },
-    { name: 'Luxora Fashion House', src: '/assets/logos/LuxoraFashionHouse.png' },
-    { name: 'MetroBank India', src: '/assets/logos/MetroBankIndia.png' },
-    { name: 'Moonlit Media Co', src: '/assets/logos/MoonlitMediaCo.png' },
-    { name: 'National Skill Network', src: '/assets/logos/NationalSkillNetworkNSN.png' },
-    { name: 'NextEra Digital', src: '/assets/logos/NextEraDigital.png' },
-    { name: 'PixelShift Studios', src: '/assets/logos/PixelShiftStudios.png' },
-    { name: 'RoyalVerse Events', src: '/assets/logos/RoyalVerseEvents.png' },
-    { name: 'Studio NeonArc', src: '/assets/logos/StudioNeonArc.png' },
-    { name: 'TeraLaunch Innovations', src: '/assets/logos/TeraLaunchInnovations.png' },
-    { name: 'UrbanCare Hospitals', src: '/assets/logos/UrbanCareHospitals.png' },
+    { name: 'Manyavar', src: 'https://www.google.com/s2/favicons?domain=manyavar.com&sz=128' },
+    { name: 'Apollo Pharmacy', src: 'https://www.google.com/s2/favicons?domain=apollopharmacy.in&sz=128' },
+    { name: 'Dabur', src: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/65/Dabur_Logo.svg/1200px-Dabur_Logo.svg.png' },
+    { name: 'Colorbar', src: '/assets/logos/colorbar.png' },
+    { name: 'Policybazaar', src: 'https://www.google.com/s2/favicons?domain=policybazaar.com&sz=128' },
+    { name: 'Emami', src: 'https://www.google.com/s2/favicons?domain=emamiltd.in&sz=128' },
+    { name: 'Snapdeal', src: 'https://www.google.com/s2/favicons?domain=snapdeal.com&sz=128' },
+    { name: 'HDFC Bank', src: 'https://www.google.com/s2/favicons?domain=hdfcbank.com&sz=128' },
+    { name: 'Plum', src: 'https://www.google.com/s2/favicons?domain=plumgoodness.com&sz=128' },
+    { name: 'Ajanta', src: 'https://www.google.com/s2/favicons?domain=ajantapharma.com&sz=128' },
 ];
 
 const Clients = () => {
@@ -93,11 +86,11 @@ const Clients = () => {
                                         key={`${logo.name}-${index}`}
                                         className="flex items-center gap-5 select-none transition-transform duration-300 hover:scale-105 group"
                                     >
-                                        <div className="h-12 w-12 md:h-16 md:w-16 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover:bg-black/50">
+                                        <div className="h-12 md:h-16 px-2 md:px-4 min-w-[3rem] md:min-w-[4rem] rounded-xl bg-white flex items-center justify-center shadow-lg transition-colors overflow-hidden">
                                             <img
                                                 src={logo.src}
                                                 alt={logo.name}
-                                                className="h-7 w-7 md:h-9 md:w-9 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                                                className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-110"
                                                 loading="lazy"
                                             />
                                         </div>

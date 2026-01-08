@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { searchApollo, searchCompanies, getApolloUsers, ApolloPerson, ApolloCompany, ApolloUser } from '../services/apollo';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
@@ -25,86 +26,93 @@ interface Stats {
   cityStats: { _id: string; count: number }[];
 }
 
+interface JobApplication {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  university: string;
+  role: 'Internship' | 'Full-time' | 'Contract';
+  portfolio: string;
+  skills: string;
+  motivation: string;
+  submittedAt: string;
+  status: 'new' | 'reviewed' | 'shortlisted' | 'rejected';
+}
+
 // Groq AI Helper Function
-const generateAIResponse = async (contact: Contact, promptType: 'reply' | 'summary' | 'custom', customPrompt?: string): Promise<string> => {
-  if (!GROQ_API_KEY) {
-    throw new Error('Groq API key not configured');
-  }
-
-  let systemPrompt = '';
-  let userPrompt = '';
-
-  if (promptType === 'reply') {
-    systemPrompt = `You are grow+ AI, the intelligent assistant for Grow+, a creative marketing agency. Write personalized, warm, and professional email replies. Keep responses concise but helpful. Sign off as "grow+ Team".`;
-    userPrompt = `Write a professional email reply to this customer inquiry:
-    
-Customer Name: ${contact.name}
-Email: ${contact.email}
-Location: ${contact.city}, ${contact.region}
-Inquiry Type: ${contact.type}
-Subject: ${contact.subject}
-Message: ${contact.message}
-
-Write a friendly, professional response that addresses their inquiry. Include a greeting with their name and a professional sign-off from "Grow+ Team".`;
-  } else if (promptType === 'summary') {
-    systemPrompt = `You are a data analyst. Provide concise, actionable insights.`;
-    userPrompt = `Analyze this customer inquiry and provide key insights:
-    
-Customer: ${contact.name} from ${contact.city}, ${contact.region}
-Type: ${contact.type}
-Subject: ${contact.subject}
-Message: ${contact.message}
-
-Provide:
-1. Customer Intent (1 sentence)
-2. Priority Level (Low/Medium/High)
-3. Recommended Action
-4. Key Points to Address`;
-  } else {
-    systemPrompt = `You are grow+ AI, the intelligent assistant for Grow+, a creative marketing agency. Be helpful and professional.`;
-    userPrompt = customPrompt || '';
-  }
+const generateAIResponse = async (data: any, promptType: 'reply' | 'summary' | 'market_research' | 'custom', customPrompt?: string): Promise<string> => {
+  // Use backend proxy for AI generation
+  const systemPrompt = getSystemPrompt(promptType);
+  const userPrompt = getUserPrompt(data, promptType, customPrompt);
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1024,
-      }),
+    const response = await axios.post(`${API_URL}/api/integrations/ai/generate`, {
+        systemPrompt,
+        userPrompt
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to generate AI response');
-    }
-
-    const data = await response.json();
-    return data.choices[0]?.message?.content || 'Unable to generate response';
+    return response.data.content || 'Unable to generate response';
   } catch (error) {
-    console.error('Groq AI Error:', error);
+    console.error('Groq AI Error (via Backend):', error);
     throw error;
   }
 };
+
+const getSystemPrompt = (type: string) => {
+    switch(type) {
+        case 'reply': return `You are grow+ AI, the intelligent assistant for Grow+, a creative marketing agency. Write personalized, warm, and professional email replies. Keep responses concise but helpful. Sign off as "grow+ Team".`;
+        case 'summary': return `You are a data analyst. Provide concise, actionable insights.`;
+        case 'market_research': return `You are a Market Research Expert. specific in finding leads and company data. You are helping a user search a database (Apollo.io).`;
+        default: return `You are grow+ AI, the intelligent assistant for Grow+.`;
+    }
+}
+
+const getUserPrompt = (data: any, type: string, custom?: string) => {
+    if (type === 'market_research') {
+        return `The user is looking for: "${data}".
+        Provide 5 specific, optimized search keywords or phrases they should use to find the best results.
+        Also provide a 1-sentence strategic advice on who to target.
+        
+        Format:
+        Strategy: [1 sentence advice]
+        Keywords: [keyword1], [keyword2], [keyword3], [keyword4], [keyword5]`;
+    }
+    if (type === 'reply') {
+        const c = data as Contact;
+        return `Write a professional email reply to this customer inquiry:
+        Customer: ${c.name} (${c.email})
+        Subject: ${c.subject}
+        Message: ${c.message}`;
+    }
+    if (type === 'summary') {
+        const c = data as Contact;
+        return `Analyze this inquiry: ${c.subject} - ${c.message}`;
+    }
+    return custom || '';
+}
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [applications, setApplications] = useState<JobApplication[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [activeTab, setActiveTab] = useState<'overview' | 'contacts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'careers' | 'market-intel'>('overview');
+
+  // Apollo State
+  const [apolloQuery, setApolloQuery] = useState('');
+  const [apolloTab, setApolloTab] = useState<'people' | 'companies' | 'users'>('people');
+  const [apolloPeople, setApolloPeople] = useState<ApolloPerson[]>([]);
+  const [apolloCompanies, setApolloCompanies] = useState<ApolloCompany[]>([]);
+  const [apolloUsers, setApolloUsers] = useState<ApolloUser[]>([]);
+  const [isApolloLoading, setIsApolloLoading] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<string | null>(null);
+  const [isAiSuggesting, setIsAiSuggesting] = useState(false);
   
   // Email Composer States
   const [showEmailComposer, setShowEmailComposer] = useState(false);
@@ -115,6 +123,55 @@ const AdminDashboard: React.FC = () => {
   const [aiInsights, setAiInsights] = useState<string | null>(null);
   const [showAiPanel, setShowAiPanel] = useState(false);
 
+  const handleApolloSearch = async (overrideQuery?: string) => {
+    const queryToUse = overrideQuery || apolloQuery;
+    if (!queryToUse && apolloTab !== 'users') return;
+    
+    setIsApolloLoading(true);
+    // If using an override (suggestion), update the input too
+    if (overrideQuery) setApolloQuery(overrideQuery);
+
+    try {
+      if (apolloTab === 'people') {
+         const results = await searchApollo(queryToUse);
+         setApolloPeople(results);
+      } else if (apolloTab === 'companies') {
+         const results = await searchCompanies(queryToUse);
+         setApolloCompanies(results);
+      } else if (apolloTab === 'users') {
+         const results = await getApolloUsers();
+         setApolloUsers(results);
+      }
+    } catch (error) {
+      console.error("Apollo search failed", error);
+      alert("Failed to fetch data from Apollo. Please check API configuration.");
+    } finally {
+      setIsApolloLoading(false);
+    }
+  };
+
+  const handleAiSuggestions = async () => {
+    if (!apolloQuery) return;
+    setIsAiSuggesting(true);
+    setAiSuggestions(null);
+    try {
+        const response = await generateAIResponse(apolloQuery, 'market_research');
+        setAiSuggestions(response);
+    } catch (e) {
+        console.error(e);
+        // Provide fallback suggestions instead of alert
+        setAiSuggestions(`Strategy: Target decision-makers in your specified industry with budget authority.\n\nKeywords: CEO, Director, VP Marketing, Founder, Head of Growth`);
+    } finally {
+        setIsAiSuggesting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'market-intel' && apolloTab === 'users' && apolloUsers.length === 0) {
+        handleApolloSearch();
+    }
+  }, [activeTab, apolloTab]);
+
   const fetchData = async () => {
     try {
       const [contactsRes, statsRes] = await Promise.all([
@@ -123,6 +180,11 @@ const AdminDashboard: React.FC = () => {
       ]);
       setContacts(contactsRes.data);
       setStats(statsRes.data);
+      
+      // Load Applications from LocalStorage
+      const savedApps = JSON.parse(localStorage.getItem('jobApplications') || '[]');
+      setApplications(savedApps);
+
     } catch (error) {
       console.error("Error fetching admin data", error);
     } finally {
@@ -263,6 +325,39 @@ const AdminDashboard: React.FC = () => {
               </span>
             )}
           </button>
+
+          <button
+            onClick={() => setActiveTab('careers')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+              activeTab === 'careers' 
+                ? 'bg-[#c9f31c] text-black font-semibold' 
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Careers
+            {applications.length > 0 && (
+              <span className="ml-auto bg-white/10 text-white/80 text-xs px-2 py-0.5 rounded-full">
+                {applications.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('market-intel')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+              activeTab === 'market-intel' 
+                ? 'bg-[#c9f31c] text-black font-semibold' 
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Market Intel
+          </button>
         </nav>
 
         {/* Bottom Actions */}
@@ -318,6 +413,20 @@ const AdminDashboard: React.FC = () => {
         <div className="p-8">
           {activeTab === 'overview' && (
             <>
+              {/* Overview Header & Actions */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">Dashboard Overview</h2>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-sm transition-all hover:scale-105"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  <span>Print Report</span>
+                </button>
+              </div>
+
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-[#c9f31c]/20 to-[#c9f31c]/5 border border-[#c9f31c]/30 rounded-2xl p-6">
@@ -523,16 +632,35 @@ const AdminDashboard: React.FC = () => {
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-[#c9f31c]/50 transition-all"
                   />
                 </div>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#c9f31c]/50 transition-all cursor-pointer"
+                <div className="relative">
+                  <select
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value)}
+                    className="appearance-none bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white focus:outline-none focus:border-[#c9f31c]/50 transition-all cursor-pointer min-w-[140px]"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="Business">Business</option>
+                    <option value="General">General</option>
+                    <option value="Support">Support</option>
+                  </select>
+                  <svg 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:scale-105"
                 >
-                  <option value="all">All Types</option>
-                  <option value="Business">Business</option>
-                  <option value="General">General</option>
-                  <option value="Support">Support</option>
-                </select>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  <span>Print / PDF</span>
+                </button>
               </div>
 
               {/* Contacts List */}
@@ -620,6 +748,379 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             </>
+          )}
+
+          {activeTab === 'careers' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold">Applications ({applications.length})</h3>
+                <button
+                  onClick={() => {
+                    const printContent = document.getElementById('applications-table')?.innerHTML;
+                    const win = window.open('', '', 'height=700,width=1000');
+                    if(win) {
+                        win.document.write('<html><head><title>Job Applications</title>');
+                        win.document.write('<style>body { font-family: sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } h1 { margin-bottom: 20px; }</style>');
+                        win.document.write('</head><body>');
+                        win.document.write('<h1 style="font-size: 24px; font-weight: bold;">Job Applications Data</h1>');
+                        win.document.write('<table>');
+                        win.document.write(printContent || 'No Data');
+                        win.document.write('</table>');
+                        win.document.write('</body></html>');
+                        win.document.close();
+                        win.print();
+                    }
+                  }}
+                  className="flex items-center gap-2 bg-[#c9f31c] text-black px-4 py-2 rounded-lg font-bold hover:bg-[#b0d618] transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                  Print / PDF
+                </button>
+              </div>
+
+              <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse" id="applications-table">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Candidate</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Role</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">University</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Skills</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Submitted</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {applications.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-white/40">
+                            No applications received yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        applications.map((app) => (
+                          <tr key={app.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4">
+                              <div>
+                                <p className="font-bold text-white">{app.name}</p>
+                                <p className="text-sm text-white/60">{app.email}</p>
+                                <p className="text-xs text-white/40">{app.phone}</p>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                app.role === 'Internship' ? 'bg-blue-500/20 text-blue-400' :
+                                app.role === 'Full-time' ? 'bg-green-500/20 text-green-400' :
+                                'bg-purple-500/20 text-purple-400'
+                              }`}>
+                                {app.role}
+                              </span>
+                            </td>
+                            <td className="p-4 text-sm text-white/80">{app.university}</td>
+                            <td className="p-4 text-sm text-white/60 max-w-xs truncate" title={app.skills}>
+                              {app.skills}
+                            </td>
+                            <td className="p-4 text-sm text-white/60">
+                              {new Date(app.submittedAt).toLocaleDateString()}
+                            </td>
+                            <td className="p-4">
+                              <div className="flex gap-2">
+                                {app.portfolio && (
+                                  <a href={app.portfolio} target="_blank" rel="noreferrer" className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-cyan-400" title="View Portfolio">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                  </a>
+                                )}
+                                <a href={`mailto:${app.email}`} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-[#c9f31c]" title="Email Candidate">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'market-intel' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold">Market Intelligence</h3>
+                <div className="flex items-center gap-2 bg-[#0a0a0a] rounded-lg p-1 border border-white/10">
+                   <button 
+                     onClick={() => setApolloTab('people')}
+                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${apolloTab === 'people' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'}`}
+                   >People</button>
+                   <button 
+                     onClick={() => setApolloTab('companies')}
+                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${apolloTab === 'companies' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'}`}
+                   >Companies</button>
+                   <button 
+                     onClick={() => setApolloTab('users')}
+                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${apolloTab === 'users' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'}`}
+                   >Team</button>
+                </div>
+              </div>
+
+              {/* Search Box */}
+              {apolloTab !== 'users' && (
+              <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 space-y-4">
+                 <div className="flex gap-4">
+                   <div className="flex-1 relative">
+                     <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <input 
+                        type="text" 
+                        value={apolloQuery}
+                        onChange={(e) => setApolloQuery(e.target.value)}
+                        placeholder={apolloTab === 'people' ? "Search people (e.g. 'CEO at SaaS') or ask AI..." : "Search companies (e.g. 'Fintech in NY')"}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-[#c9f31c] transition-all"
+                        onKeyDown={(e) => e.key === 'Enter' && handleApolloSearch()}
+                      />
+                      {/* AI Button inside Input */}
+                      <button
+                        onClick={handleAiSuggestions}
+                        disabled={isAiSuggesting || !apolloQuery}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 border border-purple-500/30 rounded-lg text-purple-300 text-xs font-medium transition-all flex items-center gap-2 disabled:opacity-50"
+                        title="Optimize your search using grow+ AI"
+                      >
+                         {isAiSuggesting ? (
+                             <span className="animate-pulse">Thinking...</span>
+                         ) : (
+                             <>
+                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                             Ask AI Info
+                             </>
+                         )}
+                      </button>
+                   </div>
+                   <button 
+                     onClick={() => handleApolloSearch()}
+                     disabled={isApolloLoading}
+                     className="bg-[#c9f31c] text-black px-8 py-3 rounded-xl font-bold hover:bg-[#b0d618] transition-colors disabled:opacity-50 flex items-center gap-2"
+                   >
+                     {isApolloLoading ? (
+                       <>
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        Searching
+                       </>
+                     ) : (
+                       'Search'
+                     )}
+                   </button>
+                 </div>
+
+                 {/* AI Suggestions Display */}
+                 {aiSuggestions && (
+                     <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-xl p-4">
+                         <div className="flex items-start gap-3">
+                             <div className="p-2 bg-purple-500/20 rounded-lg shrink-0">
+                                 <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                             </div>
+                             <div>
+                                 <h4 className="text-sm font-bold text-purple-300 mb-1">AI Strategic Intelligence</h4>
+                                 <p className="text-sm text-white/70 whitespace-pre-wrap">{aiSuggestions}</p>
+                             </div>
+                         </div>
+                     </div>
+                 )}
+
+                 {/* Quick Suggestions (Chips) */}
+                 <div>
+                    <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Suggestions & Quick Access</p>
+                    <div className="flex flex-wrap gap-2">
+                        {apolloTab === 'people' ? (
+                            ['CEO at Tech Startups', 'Marketing Directors in NY', 'Founders in E-commerce', 'Head of Sales in London', 'Software Engineers (Senior)', 'Investors (Angel)', 'Creative Directors'].map(term => (
+                                <button
+                                    key={term}
+                                    onClick={() => handleApolloSearch(term)}
+                                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs text-white/70 transition-colors"
+                                >
+                                    {term}
+                                </button>
+                            ))
+                        ) : (
+                             ['SaaS Companies (Series A)', 'Marketing Agencies', 'Fintech Startups', 'Direct-to-Consumer Brands', 'Sustainable Tech', 'Artificial Intelligence Labs'].map(term => (
+                                <button
+                                    key={term}
+                                    onClick={() => handleApolloSearch(term)}
+                                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs text-white/70 transition-colors"
+                                >
+                                    {term}
+                                </button>
+                            ))
+                        )}
+                    </div>
+                 </div>
+              </div>
+              )}
+
+              {/* People Results Table */}
+              {apolloTab === 'people' && (
+              <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Name</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Title</th>
+                         <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Company</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Location</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Social</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {apolloPeople.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="p-12 text-center text-white/40">
+                             {isApolloLoading ? 'Fetching data...' : 'No results found. Try a new search.'}
+                          </td>
+                        </tr>
+                      ) : (
+                        apolloPeople.map((person) => (
+                          <tr key={person.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4">
+                              <div className="font-bold text-white">{person.name || 'N/A'}</div>
+                            </td>
+                            <td className="p-4 text-sm text-white/80">
+                               {person.title || 'N/A'}
+                            </td>
+                            <td className="p-4 text-sm text-white/80">
+                               {person.organization?.name || 'N/A'}
+                            </td>
+                             <td className="p-4 text-sm text-white/60">
+                               {person.city}, {person.country}
+                            </td>
+                            <td className="p-4">
+                              {person.linkedin_url && (
+                                <a 
+                                  href={person.linkedin_url} 
+                                  target="_blank" 
+                                  rel="noreferrer"
+                                  className="text-[#0077b5] hover:underline flex items-center gap-1"
+                                >
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                  LinkedIn
+                                </a>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              )}
+
+              {/* Company Results Table */}
+              {apolloTab === 'companies' && (
+              <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Company</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Website</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Platform</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {apolloCompanies.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-12 text-center text-white/40">
+                             {isApolloLoading ? 'Fetching data...' : 'No results found. Try a new search.'}
+                          </td>
+                        </tr>
+                      ) : (
+                        apolloCompanies.map((comp) => (
+                          <tr key={comp.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                {comp.logo_url && <img src={comp.logo_url} alt="" className="w-8 h-8 rounded bg-white" />}
+                                <div className="font-bold text-white">{comp.name || 'N/A'}</div>
+                              </div>
+                            </td>
+                            <td className="p-4 text-sm">
+                               {comp.website_url && <a href={comp.website_url} target="_blank" rel="noreferrer" className="text-[#c9f31c] hover:underline">Visit Site</a>}
+                            </td>
+                            <td className="p-4 text-sm text-white/80">
+                               <div className="flex gap-2">
+                               {comp.linkedin_url && (
+                                <a href={comp.linkedin_url} target="_blank" rel="noreferrer" className="text-white/60 hover:text-[#0077b5]">
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                </a>
+                               )}
+                               {comp.twitter_url && (
+                                <a href={comp.twitter_url} target="_blank" rel="noreferrer" className="text-white/60 hover:text-[#1DA1F2]">
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                                </a>
+                               )}
+                               </div>
+                            </td>
+                             <td className="p-4 text-sm text-white/60 max-w-xs truncate" title={comp.short_description}>
+                               {comp.short_description || 'N/A'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              )}
+
+              {/* Users Table */}
+              {apolloTab === 'users' && (
+              <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10">
+                   <h4 className="font-semibold">Team Members</h4>
+                   <p className="text-sm text-white/40">Registered users in organisation</p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5">
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Name</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Email</th>
+                        <th className="p-4 text-xs uppercase tracking-wider text-white/40 font-medium">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {apolloUsers.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="p-12 text-center text-white/40">
+                             {isApolloLoading ? 'Fetching team members...' : 'No users found or lack permissions.'}
+                          </td>
+                        </tr>
+                      ) : (
+                        apolloUsers.map((user) => (
+                          <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4">
+                              <div className="font-bold text-white">{user.first_name} {user.last_name}</div>
+                            </td>
+                            <td className="p-4 text-sm text-white/80">
+                               {user.email}
+                            </td>
+                            <td className="p-4">
+                               <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Active</span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              )}
+
+            </div>
           )}
         </div>
       </main>

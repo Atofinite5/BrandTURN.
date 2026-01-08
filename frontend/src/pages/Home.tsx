@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SmoothScroll from '../components/ui/SmoothScroll';
 import Navbar from '../components/ui/Navbar';
@@ -13,12 +14,25 @@ import AuthModal from '../components/AuthModal';
 const Home = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { user } = useAuth();
+  const location = useLocation();
 
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
     localStorage.setItem('hasSeenAuthModal', 'true');
   };
+
+  useEffect(() => {
+    if (location.hash) {
+      const elementId = location.hash.replace('#', '');
+      const element = document.getElementById(elementId);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location]);
 
   useEffect(() => {
     const hasSeenModal = localStorage.getItem('hasSeenAuthModal');
