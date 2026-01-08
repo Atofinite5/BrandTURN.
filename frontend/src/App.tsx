@@ -7,14 +7,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route 
-        path="/admin" 
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } 
-      />
+      <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
   );
 }

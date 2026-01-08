@@ -87,23 +87,24 @@ const Hero = ({ onAuthClick }: HeroProps) => {
             </div>
 
             <div className="container mx-auto px-6 relative z-10 text-center transform-style-3d pointer-events-none">
+                {/* Orange line above text */}
+                <div className="w-32 h-1 bg-primary mx-auto mb-8" style={{ transform: 'translateZ(50px)' }} />
+                
                 <h1
                     ref={textRef}
-                    className="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tighter font-display mb-8 leading-tight"
+                    className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight font-display mb-8 leading-tight text-white"
                     style={{ transform: 'translateZ(50px)' }}
                 >
-                    We Turn Brands <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                        Into Icons
-                    </span>
+                    WE DON'T <br />
+                    PROMOTE <span className="inline-block bg-primary text-black px-4 py-1">BRANDS.</span>
                 </h1>
 
                 <p
                     ref={subTextRef}
-                    className="text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 font-light"
+                    className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-12 font-light"
                     style={{ transform: 'translateZ(30px)' }}
                 >
-                    Elevate your digital presence with cutting-edge design, immersive experiences, and strategic branding that leaves a lasting impact.
+                    We turn them into <span className="font-bold text-white">Digital Powerhouses.</span>
                 </p>
 
                 <div className="pointer-events-auto" style={{ transform: 'translateZ(40px)' }}>
@@ -120,8 +121,12 @@ const Hero = ({ onAuthClick }: HeroProps) => {
                 <ChevronDown size={32} />
             </div>
 
-            {/* Gradient Overlay for smooth transition */}
-            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-zinc-950 to-transparent z-20 pointer-events-none" />
+            {/* Gradient Binding - Smooth transition to Services */}
+            <div className="absolute bottom-0 left-0 w-full h-48 z-20 pointer-events-none"
+                style={{
+                    background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 30%, #1e3a5f 100%)'
+                }}
+            />
         </section>
     );
 };

@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
     { name: 'Home', path: '/' },
     { name: 'Services', path: '/services' },
     { name: 'Clients', path: '/clients' },
-    { name: 'About', path: '/about' }
+    { name: 'Contact', path: '#contact' }
   ];
 
   useLayoutEffect(() => {

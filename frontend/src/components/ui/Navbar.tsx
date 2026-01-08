@@ -36,7 +36,6 @@ const Navbar = ({ onAuthClick }: NavbarProps) => {
     }, []);
 
     const navLinks = [
-        { name: 'About', href: '#about' },
         { name: 'Services', href: '#services' },
         { name: 'Clients', href: '#clients' },
         { name: 'Contact', href: '#contact' },

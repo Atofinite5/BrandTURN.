@@ -3,11 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import SmoothScroll from '../components/ui/SmoothScroll';
 import Navbar from '../components/ui/Navbar';
 import Hero from '../components/sections/Hero';
-import About from '../components/sections/About';
 import Services from '../components/sections/Services';
 import Clients from '../components/sections/Clients';
 import Contact from '../components/sections/Contact';
 import FAQ from '../components/sections/FAQ';
+import Footer from '../components/sections/Footer';
 import AuthModal from '../components/AuthModal';
 
 const Home = () => {
@@ -37,12 +37,12 @@ const Home = () => {
         <Navbar onAuthClick={openAuthModal} />
         <main>
           <Hero onAuthClick={openAuthModal} />
-          <About />
           <Services />
           <Clients />
           <FAQ />
           <Contact />
         </main>
+        <Footer />
         <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
       </div>
     </SmoothScroll>

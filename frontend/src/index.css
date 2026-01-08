@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #242F40;
+  --color-background: #0a0a0a;
   --color-foreground: #F1FFFA;
   --color-primary: #FCA311;
   --color-secondary: #00A878;
@@ -15,8 +15,14 @@
 }
 
 :root {
-  --background: #242F40;
+  /* Base Colors */
+  --background: #0a0a0a;
+  --background-secondary: #111111;
   --foreground: #F1FFFA;
+  
+  /* Section Background - Metallic Black */
+  --section-bg: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+  --section-bg-alt: linear-gradient(180deg, #0a0a0a 0%, #151515 100%);
 }
 
 body {
@@ -33,7 +39,64 @@ body {
   color: white;
 }
 
-/* Custom Scrollbar */
+/* ========================================
+   SECTION BACKGROUNDS - GLOBAL STYLES
+   ======================================== */
+
+/* Metallic Black Section Background */
+.section-dark {
+  position: relative;
+  overflow: hidden;
+  background: var(--section-bg);
+}
+
+.section-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.section-dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.section-dark > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Alternative dark section */
+.section-black {
+  background: #0a0a0a;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient helpers */
+.gradient-fade-bottom {
+  background: linear-gradient(to top, #0a0a0a, transparent);
+}
+
+.gradient-fade-left {
+  background: linear-gradient(to right, #0a0a0a, transparent);
+}
+
+.gradient-fade-right {
+  background: linear-gradient(to left, #0a0a0a, transparent);
+}
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -51,6 +114,10 @@ body {
   background: #555;
 }
 
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
 .accent-bg {
   background-color: var(--color-accent);
 }
@@ -59,7 +126,6 @@ body {
   color: var(--color-accent);
 }
 
-/* Utilities */
 .glass {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);

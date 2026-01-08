@@ -1,13 +1,13 @@
-# Deployment Guide for BrandTurn
+# Deployment Guide for grow+
 
-This guide will help you publish your website to `brandturn.co.in`.
+This guide will help you deploy your grow+ website.
 
 ## Prerequisites
 
-1.  **GitHub Account**: You need to push this code to a GitHub repository.
+1.  **GitHub Account**: Push your code to a GitHub repository.
 2.  **Vercel Account**: For hosting the Frontend (React).
 3.  **Render Account**: For hosting the Backend (Node.js).
-4.  **GoDaddy Account**: To configure your domain.
+4.  **MongoDB Atlas**: For the database (free tier available).
 
 ## Step 1: Push Code to GitHub
 
@@ -30,18 +30,19 @@ This guide will help you publish your website to `brandturn.co.in`.
 2.  Click **New +** -> **Web Service**.
 3.  Connect your GitHub repository.
 4.  **Settings**:
-    *   **Name**: `brandturn-backend` (or similar)
+    *   **Name**: `growplus-backend`
     *   **Root Directory**: `backend`
     *   **Environment**: `Node`
     *   **Build Command**: `npm install && npm run build`
     *   **Start Command**: `npm start`
-5.  **Environment Variables** (Scroll down to "Advanced"):
-    *   `JWT_SECRET`: `your_secret_key_here` (Use a strong random string)
+5.  **Environment Variables** (Add these in Render Dashboard):
+    *   `PORT`: `5002`
+    *   `MONGO_URI`: `your_mongodb_atlas_connection_string`
+    *   `JWT_SECRET`: `your_strong_secret_key` (Use a strong random string)
     *   `NODE_ENV`: `production`
-    *   `MONGO_URI`: `your_mongodb_connection_string` (Required for security)
-    *   `FRONTEND_URL`: `https://your-frontend-app.vercel.app` (Add this after deploying frontend)
+    *   `FRONTEND_URL`: `https://your-vercel-app.vercel.app` (Update after deploying frontend)
 6.  Click **Create Web Service**.
-7.  Wait for the deployment to finish. Copy the **Service URL** (e.g., `https://brandturn-backend.onrender.com`).
+7.  Wait for deployment. Copy the **Service URL** (e.g., `https://growplus-backend.onrender.com`).
 
 ## Step 3: Deploy Frontend (Vercel)
 
@@ -50,31 +51,54 @@ This guide will help you publish your website to `brandturn.co.in`.
 3.  Import your GitHub repository.
 4.  **Project Settings**:
     *   **Framework Preset**: Vite
-    *   **Root Directory**: `frontend` (Click "Edit" next to Root Directory and select `frontend`)
-5.  **Environment Variables**:
-    *   `VITE_API_URL`: `https://brandturn-backend.onrender.com` (The URL from Step 2)
-    *   `GEMINI_API_KEY`: `your_gemini_api_key`
-6.  Click **Deploy**.
-    *   **Framework Preset**: Vite (should be detected automatically).
-    *   **Root Directory**: Click "Edit" and select `frontend`.
-5.  **Environment Variables**:
-    *   Key: `VITE_API_URL`
-    *   Value: The Backend URL you copied from Render (e.g., `https://brandturn-backend.onrender.com`). **Do not add a trailing slash.**
+    *   **Root Directory**: `frontend` (Click "Edit" and select `frontend`)
+5.  **Environment Variables** (Add these in Vercel Dashboard):
+    *   `VITE_API_URL`: `https://growplus-backend.onrender.com` (Your backend URL from Step 2)
+    *   `VITE_GOOGLE_CLIENT_ID`: `your_google_client_id`
+    *   `VITE_GROQ_API_KEY`: `your_groq_api_key`
 6.  Click **Deploy**.
 
-## Step 4: Connect Domain (GoDaddy)
+## Step 4: Update Backend CORS (Important!)
 
+After deploying frontend, go back to Render and update:
+*   `FRONTEND_URL`: `https://your-vercel-app.vercel.app` (Your Vercel URL)
+
+## Step 5: Connect Custom Domain (Optional)
+
+### On Vercel:
 1.  Go to your Vercel Project Dashboard.
 2.  Click **Settings** -> **Domains**.
-3.  Enter `brandturn.co.in` and click **Add**.
+3.  Enter your domain and click **Add**.
 4.  Vercel will show you DNS records to add.
-    *   **A Record**: `@` pointing to `76.76.21.21`
-    *   **CNAME Record**: `www` pointing to `cname.vercel-dns.com`
-5.  Log in to GoDaddy, go to **DNS Management** for your domain.
-6.  Add/Update these records.
-7.  Wait for propagation (usually minutes, up to 24h).
 
-## Step 5: Final Check
+### DNS Settings:
+*   **A Record**: `@` pointing to `76.76.21.21`
+*   **CNAME Record**: `www` pointing to `cname.vercel-dns.com`
 
-1.  Visit `https://brandturn.co.in`.
-2.  Try logging in/registering to ensure the frontend can talk to the backend.
+## Step 6: Final Checklist
+
+- [ ] Backend deployed on Render
+- [ ] Frontend deployed on Vercel
+- [ ] Environment variables set correctly
+- [ ] CORS configured (FRONTEND_URL in backend)
+- [ ] Test login/signup functionality
+- [ ] Test contact form submission
+- [ ] Test Admin Dashboard with grow+ AI
+
+## Environment Variables Summary
+
+### Backend (Render):
+```
+PORT=5002
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=your_strong_secret
+NODE_ENV=production
+FRONTEND_URL=https://your-app.vercel.app
+```
+
+### Frontend (Vercel):
+```
+VITE_API_URL=https://your-backend.onrender.com
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GROQ_API_KEY=your_groq_api_key
+```

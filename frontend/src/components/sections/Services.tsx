@@ -1,102 +1,102 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Palette, Globe, Megaphone, Code, ArrowRight, CheckCircle2 } from 'lucide-react';
-import SpotlightButton from '../ui/SpotlightButton';
-import CardSwap, { Card } from '../ui/CardSwap';
+import CircularGallery from '../ui/CircularGallery';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const servicesList = [
+const galleryItems = [
     {
-        icon: <Palette className="w-12 h-12" />,
-        title: 'Brand Identity',
-        description: 'We craft unique visual identities that resonate with your audience and stand the test of time.',
-        features: ['Logo Design', 'Brand Guidelines', 'Visual Strategy', 'Typography & Color'],
+        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+        text: 'Strategy-Driven'
     },
     {
-        icon: <Globe className="w-12 h-12" />,
-        title: 'Web Design',
-        description: 'Immersive, responsive, and user-centric websites that drive engagement and conversions.',
-        features: ['UI/UX Design', 'Wireframing', 'Prototyping', 'Mobile Responsiveness'],
+        image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80',
+        text: 'Guiding Brands'
     },
     {
-        icon: <Code className="w-12 h-12   " />,
-        title: 'Development',
-        description: 'Robust and scalable frontend and backend solutions using the latest technologies.',
-        features: ['Frontend (React/Vue)', 'Backend (Node/Python)', 'CMS Integration', 'E-commerce'],
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+        text: 'Smart Strategy'
     },
     {
-        icon: <Megaphone className="w-12 h-12" />,
-        title: 'Digital Marketing',
-        description: 'Strategic campaigns that amplify your reach and connect you with the right customers.',
-        features: ['SEO Optimization', 'Social Media Strategy', 'Content Marketing', 'Analytics'],
+        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
+        text: 'Brand Identity'
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80',
+        text: 'Social Media'
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
+        text: 'Web Design'
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
+        text: 'Marketing'
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80',
+        text: 'Creative Team'
     },
 ];
 
+const serviceTags = ['Brand Identity', 'Social Media', 'Web Design', 'Marketing'];
+
 const Services = () => {
-    const sectionRef = useRef(null);
-
     return (
-        <section id="services" ref={sectionRef} className="py-32 bg-zinc-950 relative overflow-hidden">
-            {/* Decorative Background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+        <section 
+            id="services" 
+            className="relative overflow-hidden"
+            style={{
+                background: 'linear-gradient(180deg, #1e3a5f 0%, #2d5a8c 25%, #4f8ac1 50%, #72a5cd 75%, #7fb0d3 100%)'
+            }}
+        >
+            {/* Top Gradient Binding - Smooth blend from Hero */}
+            <div 
+                className="absolute top-0 left-0 w-full h-24 z-10 pointer-events-none"
+                style={{
+                    background: 'linear-gradient(to bottom, #1e3a5f 0%, transparent 100%)'
+                }}
+            />
 
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="mb-24 text-center">
-                    <span className="text-secondary font-semibold tracking-widest uppercase text-sm mb-4 block">
-                        Our Expertise
+            <div className="container mx-auto px-6 relative z-10 pt-24">
+                {/* Header */}
+                <div className="mb-8 text-center">
+                    <span className="text-white/60 font-medium tracking-[0.3em] uppercase text-sm mb-2 block">
+                        BRANDTURN
                     </span>
-                    <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
-                        Services Built for <span className="text-primary">Growth</span>
+                    <h2 className="text-4xl md:text-5xl font-display font-bold text-white">
+                        SOCIAL MEDIA
                     </h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-                        Comprehensive design and technology solutions to help your business grow and stand out in the digital landscape.
-                    </p>
-                </div>
-
-                <div className="flex justify-center items-center min-h-[600px] relative">
-                    <CardSwap
-                        cardDistance={60}
-                        verticalDistance={70}
-                        delay={5000}
-                        pauseOnHover={false}
-                        width="100%"
-                        height="100%"
-                    >
-                        {servicesList.map((service, index) => (
-                            <Card key={index} customClass="w-full max-w-4xl bg-zinc-900/90 border border-white/10 backdrop-blur-xl p-0 overflow-hidden">
-                                <div className="flex flex-col md:flex-row h-full">
-                                    <div className="md:w-1/3 p-8 md:p-12 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/10">
-                                        <div className="mb-6 text-primary">
-                                            {service.icon}
-                                        </div>
-                                        <h3 className="text-3xl font-bold text-white mb-4">{service.title}</h3>
-                                        <p className="text-gray-400 leading-relaxed mb-6">
-                                            {service.description}
-                                        </p>
-                                        <SpotlightButton href="#contact" variant="outline" className="inline-flex items-center gap-2 w-fit">
-                                            Get Started <ArrowRight size={20} />
-                                        </SpotlightButton>
-                                    </div>
-
-                                    <div className="md:w-2/3 p-8 md:p-12 bg-black/20">
-                                        <h4 className="text-lg font-semibold mb-6 text-gray-300">Key Deliverables</h4>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {service.features.map((feature, idx) => (
-                                                <div key={idx} className="flex items-center gap-3">
-                                                    <CheckCircle2 className="text-secondary w-5 h-5" />
-                                                    <span className="text-gray-300">{feature}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
-                    </CardSwap>
                 </div>
             </div>
+
+            {/* Circular Gallery */}
+            <div style={{ height: '600px', position: 'relative' }}>
+                <CircularGallery 
+                    items={galleryItems}
+                    bend={3} 
+                    textColor="#ffffff" 
+                    borderRadius={0.05} 
+                    scrollEase={0.02}
+                />
+            </div>
+
+            {/* Service Tags */}
+            <div className="container mx-auto px-6 relative z-10 pb-10">
+                <div className="flex flex-wrap justify-center gap-4 mt-8">
+                    {serviceTags.map((tag, index) => (
+                        <span
+                            key={index}
+                            className="px-6 py-3 rounded-full border border-white/30 text-white/90 text-sm font-medium
+                                     hover:bg-white/10 hover:border-white/50 transition-all duration-300 cursor-pointer"
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            </div>
+            <div 
+                className="w-full h-32 absolute bottom-0 left-0 pointer-events-none"
+                style={{
+                    background: 'linear-gradient(to bottom, transparent 0%, #7fb0d3 100%)'
+                }}
+            />
         </section>
     );
 };
