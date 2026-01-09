@@ -67,8 +67,8 @@ const Services = () => {
                     <span className="text-white/60 font-medium tracking-[0.3em] uppercase text-sm mb-2 block">
                         BRANDTURN
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-display font-bold text-white">
-                        SERVICES
+                    <h2 className="text-4xl md:text-5xl font-didot font-bold text-white">
+                        HOW WE HELP BRANDS GROW
                     </h2>
                 </div>
             </div>

@@ -32,10 +32,10 @@ const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
 
   const headerRef = useRef<HTMLElement>(null);
   const navLinks = [
-    { name: 'Home', path: '/', className: '' },
-    { name: 'How We Help Brands Grow', path: '/services', className: 'font-didot' },
-    { name: 'Clients', path: '/clients', className: '' },
-    { name: 'Contact', path: '#contact', className: '' }
+    { name: 'Home', path: '/' },
+    { name: 'Services', path: '/services' },
+    { name: 'Clients', path: '/clients' },
+    { name: 'Contact', path: '#contact' }
   ];
 
   useLayoutEffect(() => {
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
 
         <nav className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link key={link.name} to={link.path} className={`text-sm font-medium text-white/70 hover:text-[var(--color-primary)] transition-colors uppercase tracking-widest ${link.className}`}>
+            <Link key={link.name} to={link.path} className="text-sm font-medium text-white/70 hover:text-[var(--color-primary)] transition-colors uppercase tracking-widest">
               {link.name}
             </Link>
           ))}
