@@ -23,7 +23,8 @@ export default {
     fraunces: ["Fraunces", "serif"],
     lobster: ["Lobster", "cursive"],
     raleway: ["Raleway", "sans-serif"],
-    greatvibes: ["Great Vibes", "cursive"]
+    greatvibes: ["Great Vibes", "cursive"],
+    didot: ["Didot", "serif"]
   
     }},
   },
