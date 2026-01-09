@@ -24,7 +24,7 @@ export default {
     lobster: ["Lobster", "cursive"],
     raleway: ["Raleway", "sans-serif"],
     greatvibes: ["Great Vibes", "cursive"],
-    didot: ["Didot", "serif"]
+    didot: ["GFS Didot", "serif"]
   
     }},
   },
