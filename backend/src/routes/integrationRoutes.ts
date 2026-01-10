@@ -7,7 +7,7 @@ dotenv.config();
 const router = express.Router();
 
 // Configuration from environment
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 
 
 
