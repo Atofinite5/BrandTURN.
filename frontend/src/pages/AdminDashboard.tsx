@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import Chatbot from '../components/Chatbot';
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
@@ -102,7 +103,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'careers'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'careers' | 'chatbot'>('overview');
   
   // Email Composer States
   const [showEmailComposer, setShowEmailComposer] = useState(false);
@@ -272,8 +273,8 @@ const AdminDashboard: React.FC = () => {
           <button
             onClick={() => setActiveTab('careers')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-              activeTab === 'careers' 
-                ? 'bg-[#c9f31c] text-black font-semibold' 
+              activeTab === 'careers'
+                ? 'bg-[#c9f31c] text-black font-semibold'
                 : 'text-white/60 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -286,6 +287,20 @@ const AdminDashboard: React.FC = () => {
                 {applications.length}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('chatbot')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+              activeTab === 'chatbot'
+                ? 'bg-[#c9f31c] text-black font-semibold'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Grow+
           </button>
 
 
@@ -773,6 +788,19 @@ const AdminDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'chatbot' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-2">Grow+ AI Assistant</h3>
+                <p className="text-white/60">Your intelligent assistant for emails, business ideas, marketing strategies, and more.</p>
+              </div>
+
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+                <Chatbot context="admin" isOpen={true} onClose={() => {}} />
               </div>
             </div>
           )}
