@@ -105,7 +105,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
     <div className="fixed bottom-4 right-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-80 h-[500px] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#c9f31c] to-[#a8e017] text-black p-4 rounded-t-2xl flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#c9f31c] to-[#a8e017] text-gray-900 p-4 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
               {chatbotName}
@@ -117,7 +117,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="text-black hover:bg-black/10 rounded-full p-1 transition-colors"
+            className="text-gray-900 hover:bg-black/10 rounded-full p-1 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -140,7 +140,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
                 className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                   message.isUser
                     ? 'bg-[#c9f31c] text-black'
-                    : context === 'landing' ? 'bg-gray-100 text-black' : 'bg-gray-100 text-gray-800'
+                    : context === 'landing' ? 'bg-gray-100 text-gray-900' : 'bg-gray-100 text-gray-800'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{message.text}</p>
