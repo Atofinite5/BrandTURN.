@@ -167,15 +167,15 @@ router.post('/apollo/search/people', async (req, res) => {
 
         console.log('Apollo People Search:', query);
 
-        const response = await axios.post(`${APOLLO_BASE_URL}/mixed_people/search`, {
-            api_key: APOLLO_API_KEY,
+        const response = await axios.post(`${APOLLO_BASE_URL}/people/search`, {
             q_keywords: query,
             page: 1,
             per_page: 15
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'X-Api-Key': APOLLO_API_KEY
             }
         });
 
@@ -194,15 +194,15 @@ router.post('/apollo/search/companies', async (req, res) => {
 
         console.log('Apollo Company Search:', query);
 
-        const response = await axios.post(`${APOLLO_BASE_URL}/mixed_companies/search`, {
-            api_key: APOLLO_API_KEY,
+        const response = await axios.post(`${APOLLO_BASE_URL}/organizations/search`, {
             q_organization_name: query,
             page: 1,
             per_page: 15
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'X-Api-Key': APOLLO_API_KEY
             }
         });
 
@@ -219,11 +219,11 @@ router.get('/apollo/users', async (req, res) => {
     try {
         const response = await axios.get(`${APOLLO_BASE_URL}/users/search`, {
             params: {
-                api_key: APOLLO_API_KEY,
                 per_page: 100
             },
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Api-Key': APOLLO_API_KEY
             }
         });
         res.json(response.data.users || []);
