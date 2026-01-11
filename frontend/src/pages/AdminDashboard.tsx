@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import Chatbot from '../components/Chatbot';
+import { searchApollo, searchCompanies, getApolloUsers } from '../services/apollo';
+import type { ApolloPerson, ApolloCompany, ApolloUser } from '../services/apollo';
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 interface Contact {
   _id: string;
@@ -102,11 +105,19 @@ const AdminDashboard: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'careers'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'contacts' | 'careers' | 'market-intel' | 'chatbot'>('overview');
   
   // Email Composer States
   const [showEmailComposer, setShowEmailComposer] = useState(false);
   const [emailContact, setEmailContact] = useState<Contact | null>(null);
+
+  // Apollo State
+  const [apolloQuery, setApolloQuery] = useState('');
+  const [apolloTab, setApolloTab] = useState<'people' | 'companies' | 'users'>('people');
+  const [apolloPeople, setApolloPeople] = useState<ApolloPerson[]>([]);
+  const [apolloCompanies, setApolloCompanies] = useState<ApolloCompany[]>([]);
+  const [apolloUsers, setApolloUsers] = useState<ApolloUser[]>([]);
+  const [isApolloLoading, setIsApolloLoading] = useState(false);
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [aiGenerating, setAiGenerating] = useState(false);
@@ -145,6 +156,49 @@ const AdminDashboard: React.FC = () => {
     logout();
     navigate('/');
   };
+
+  // Apollo Search Functions
+  const handleApolloSearch = async (overrideQuery?: string) => {
+    const queryToUse = overrideQuery || apolloQuery;
+    if (!queryToUse && apolloTab !== 'users') return;
+
+    setIsApolloLoading(true);
+    try {
+      if (apolloTab === 'people') {
+        const results = await searchApollo(queryToUse);
+        setApolloPeople(results);
+      } else if (apolloTab === 'companies') {
+        const results = await searchCompanies(queryToUse);
+        setApolloCompanies(results);
+      } else if (apolloTab === 'users') {
+        const results = await getApolloUsers();
+        setApolloUsers(results);
+      }
+    } catch (error) {
+      console.error('Apollo search error:', error);
+    } finally {
+      setIsApolloLoading(false);
+    }
+  };
+
+  const handleAiSuggestions = async () => {
+    if (!apolloQuery) return;
+    setAiGenerating(true);
+    try {
+      const response = await generateAIResponse(apolloQuery, 'market_research');
+      setAiInsights(response);
+    } catch (error) {
+      console.error('AI suggestions error:', error);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'market-intel' && apolloTab === 'users' && apolloUsers.length === 0) {
+      handleApolloSearch();
+    }
+  }, [activeTab, apolloTab]);
 
   // Open Email Composer with Contact
   const openEmailComposer = (contact: Contact) => {
@@ -272,8 +326,8 @@ const AdminDashboard: React.FC = () => {
           <button
             onClick={() => setActiveTab('careers')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-              activeTab === 'careers' 
-                ? 'bg-[#c9f31c] text-black font-semibold' 
+              activeTab === 'careers'
+                ? 'bg-[#c9f31c] text-black font-semibold'
                 : 'text-white/60 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -286,6 +340,34 @@ const AdminDashboard: React.FC = () => {
                 {applications.length}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('market-intel')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+              activeTab === 'market-intel'
+                ? 'bg-[#c9f31c] text-black font-semibold'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Market Intel
+          </button>
+
+          <button
+            onClick={() => setActiveTab('chatbot')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+              activeTab === 'chatbot'
+                ? 'bg-[#c9f31c] text-black font-semibold'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Grow+
           </button>
 
 
@@ -773,6 +855,202 @@ const AdminDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'market-intel' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-2">Market Intelligence</h3>
+                <p className="text-white/60">Search leads and company data using Apollo.io</p>
+              </div>
+
+              {/* Search Interface */}
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={apolloQuery}
+                      onChange={(e) => setApolloQuery(e.target.value)}
+                      placeholder="Search for people, companies, or keywords..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-[#c9f31c]/50 transition-all"
+                      onKeyPress={(e) => e.key === 'Enter' && handleApolloSearch()}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleApolloSearch}
+                      disabled={isApolloLoading}
+                      className="flex items-center gap-2 px-6 py-3 bg-[#c9f31c] text-black rounded-xl font-semibold hover:bg-[#b0d618] transition-all disabled:opacity-50"
+                    >
+                      {isApolloLoading ? (
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      )}
+                      Search
+                    </button>
+                    <button
+                      onClick={() => handleAiSuggestions()}
+                      disabled={aiGenerating || !apolloQuery}
+                      className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 transition-all disabled:opacity-50"
+                    >
+                      {aiGenerating ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      )}
+                      AI Tips
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="flex gap-1 mb-6 bg-white/5 rounded-xl p-1">
+                  <button
+                    onClick={() => setApolloTab('people')}
+                    className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      apolloTab === 'people' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    People
+                  </button>
+                  <button
+                    onClick={() => setApolloTab('companies')}
+                    className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      apolloTab === 'companies' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    Companies
+                  </button>
+                  <button
+                    onClick={() => setApolloTab('users')}
+                    className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      apolloTab === 'users' ? 'bg-[#c9f31c] text-black' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    Team
+                  </button>
+                </div>
+
+                {/* Results */}
+                <div className="space-y-4">
+                  {apolloTab === 'people' && apolloPeople.map((person) => (
+                    <div key={person.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-all">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#c9f31c]/20 flex items-center justify-center flex-shrink-0">
+                          {person.photo_url ? (
+                            <img src={person.photo_url} alt={person.name} className="w-12 h-12 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-[#c9f31c] font-bold text-lg">
+                              {person.first_name?.charAt(0) || person.name.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-white">{person.name}</h4>
+                          <p className="text-white/60 text-sm">{person.title}</p>
+                          {person.organization && (
+                            <p className="text-white/40 text-sm">{person.organization.name}</p>
+                          )}
+                          <div className="flex items-center gap-4 mt-2">
+                            {person.email && (
+                              <a href={`mailto:${person.email}`} className="text-[#c9f31c] text-sm hover:underline">
+                                {person.email}
+                              </a>
+                            )}
+                            {person.linkedin_url && (
+                              <a href={person.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-sm hover:underline">
+                                LinkedIn
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {apolloTab === 'companies' && apolloCompanies.map((company) => (
+                    <div key={company.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-all">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#c9f31c]/20 flex items-center justify-center flex-shrink-0">
+                          {company.logo_url ? (
+                            <img src={company.logo_url} alt={company.name} className="w-12 h-12 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-[#c9f31c] font-bold text-lg">
+                              {company.name.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-white">{company.name}</h4>
+                          <p className="text-white/60 text-sm">{company.short_description}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            {company.website_url && (
+                              <a href={company.website_url} target="_blank" rel="noopener noreferrer" className="text-[#c9f31c] text-sm hover:underline">
+                                Website
+                              </a>
+                            )}
+                            {company.linkedin_url && (
+                              <a href={company.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-sm hover:underline">
+                                LinkedIn
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {apolloTab === 'users' && apolloUsers.map((user) => (
+                    <div key={user.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-[#c9f31c]/20 flex items-center justify-center">
+                          <span className="text-[#c9f31c] font-bold">
+                            {user.first_name?.charAt(0) || user.email.charAt(0)}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-white">{user.first_name} {user.last_name}</p>
+                          <p className="text-white/60 text-sm">{user.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {!isApolloLoading && (
+                    <>
+                      {apolloTab === 'people' && apolloPeople.length === 0 && apolloQuery && (
+                        <p className="text-white/40 text-center py-8">No people found matching your search.</p>
+                      )}
+                      {apolloTab === 'companies' && apolloCompanies.length === 0 && apolloQuery && (
+                        <p className="text-white/40 text-center py-8">No companies found matching your search.</p>
+                      )}
+                      {apolloTab === 'users' && apolloUsers.length === 0 && (
+                        <p className="text-white/40 text-center py-8">No team members found.</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'chatbot' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-2">Grow+ AI Assistant</h3>
+                <p className="text-white/60">Your intelligent assistant for emails, business ideas, marketing strategies, and more.</p>
+              </div>
+
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+                <Chatbot context="admin" isOpen={true} onClose={() => {}} />
               </div>
             </div>
           )}
