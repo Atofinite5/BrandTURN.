@@ -102,8 +102,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md h-[600px] flex flex-col">
+    <div className="fixed bottom-4 right-4 z-50">
+      <div className="bg-white rounded-2xl shadow-2xl w-80 h-[500px] flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-[#c9f31c] to-[#a8e017] text-black p-4 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
