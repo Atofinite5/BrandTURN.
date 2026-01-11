@@ -172,7 +172,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9f31c] focus:border-transparent"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9f31c] focus:border-transparent text-black placeholder-gray-500"
               disabled={isTyping}
             />
             <button
