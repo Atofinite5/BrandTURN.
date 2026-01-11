@@ -16,6 +16,9 @@ const APOLLO_BASE_URL = 'https://api.apollo.io/v1';
 // --- General Chat Route ---
 
 router.post('/ai/chat', async (req, res) => {
+    console.log('GROQ_API_KEY present:', !!GROQ_API_KEY);
+    console.log('GROQ_API_KEY starts with gsk_:', GROQ_API_KEY?.startsWith('gsk_'));
+
     if (!GROQ_API_KEY) {
         return res.json({
             content: `I'm sorry, but I'm currently unavailable. Please try again later.`
@@ -54,7 +57,7 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.1-70b-versatile',
+                model: 'llama3-70b-8192',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: message }
@@ -65,7 +68,9 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
         });
 
         if (!response.ok) {
-            throw new Error(`Groq API Error: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('Groq API Error Response:', errorText);
+            throw new Error(`Groq API Error: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
         const data: any = await response.json();
@@ -125,7 +130,7 @@ router.post('/ai/generate', async (req, res) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.1-70b-versatile',
+                model: 'llama3-70b-8192',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: userPrompt }
