@@ -57,7 +57,7 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'mixtral-8x7b-32768',
+                model: 'llama3.1-8b-instant',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: message }
@@ -130,7 +130,7 @@ router.post('/ai/generate', async (req, res) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'mixtral-8x7b-32768',
+                model: 'llama3.1-8b-instant',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: userPrompt }
