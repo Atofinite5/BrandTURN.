@@ -24,7 +24,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
   const chatbotName = context === 'admin' ? 'Grow+' : 'G+';
-  const chatbotTitle = context === 'admin' ? 'Grow+ AI Assistant' : 'G+ - BrandTURN Executive';
+  const chatbotTitle = context === 'admin' ? 'Grow+ AI Assistant' : 'G+ - BrandTURN Executive Assistant';
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -136,7 +136,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
                 className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                   message.isUser
                     ? 'bg-[#c9f31c] text-black'
-                    : 'bg-gray-100 text-gray-800'
+                    : context === 'landing' ? 'bg-gray-100 text-black' : 'bg-gray-100 text-gray-800'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{message.text}</p>
@@ -149,11 +149,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-gray-100 p-3 rounded-2xl">
+              <div className={`p-3 rounded-2xl ${context === 'landing' ? 'bg-gray-100' : 'bg-gray-100'}`}>
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className={`w-2 h-2 rounded-full animate-bounce ${context === 'landing' ? 'bg-black' : 'bg-gray-400'}`}></div>
+                  <div className={`w-2 h-2 rounded-full animate-bounce ${context === 'landing' ? 'bg-black' : 'bg-gray-400'}`} style={{ animationDelay: '0.1s' }}></div>
+                  <div className={`w-2 h-2 rounded-full animate-bounce ${context === 'landing' ? 'bg-black' : 'bg-gray-400'}`} style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             </div>

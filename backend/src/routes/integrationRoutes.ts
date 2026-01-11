@@ -22,8 +22,9 @@ router.post('/ai/chat', async (req, res) => {
         });
     }
 
+    const { message, context = 'general' } = req.body;
+
     try {
-        const { message, context = 'general' } = req.body;
 
         let systemPrompt = '';
         if (context === 'admin') {
@@ -74,9 +75,33 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
 
     } catch (error: any) {
         console.error('Groq Chat Error:', error.message);
-        res.json({
-            content: `I apologize, but I'm experiencing technical difficulties. Please try again in a moment.`
-        });
+
+        // Provide context-specific fallback responses
+        let fallbackMessage = '';
+        if (context === 'admin') {
+            fallbackMessage = `I'm currently unable to process your request due to a technical issue. As Grow+ AI, I can help you with:
+
+• Writing professional emails and responses
+• Generating business ideas and strategies
+• Marketing campaign planning
+• Content creation suggestions
+• Administrative productivity tips
+
+Please try again in a moment, or let me know how else I can assist you!`;
+        } else if (context === 'landing') {
+            fallbackMessage = `I'm having trouble connecting right now. As G+, your BrandTURN executive assistant, I can help you with:
+
+• Understanding our marketing services
+• Getting suggestions for your business needs
+• Finding the right contact person
+• Learning about our process
+
+Please try your question again, or feel free to explore our website for more information!`;
+        } else {
+            fallbackMessage = `I'm experiencing a temporary connection issue. Please try again in a moment.`;
+        }
+
+        res.json({ content: fallbackMessage });
     }
 });
 
