@@ -23,8 +23,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
-  const chatbotName = context === 'admin' ? 'BT buddy' : 'BT Buddy';
-  const chatbotTitle = context === 'admin' ? 'BT buddy AI Assistant' : 'BT Buddy - BrandTURN Executive Assistant';
+  const chatbotName = context === 'admin' ? 'BT buddy' : 'BT buddy';
+  const chatbotTitle = context === 'admin' ? 'BT buddy AI Assistant' : 'BT buddy - BrandTURN Executive Assistant';
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -32,7 +32,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
         id: 'welcome',
         text: context === 'admin'
           ? `Hello! I'm BT buddy, your AI assistant for the admin panel. I can help you with writing emails, generating business ideas, marketing strategies, and more. How can I assist you today?`
-          : `Hi there! I'm BT Buddy, your BrandTURN executive assistant. I'm here to help you understand our services, provide marketing suggestions, or guide you to the right resources. What can I help you with?`,
+          : `Hi there! I'm BT buddy, your BrandTURN executive assistant. I'm here to help you understand our services, provide marketing suggestions, or guide you to the right resources. What can I help you with?`,
         isUser: false,
         timestamp: new Date()
       };

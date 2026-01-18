@@ -9,4 +9,4 @@
 - [x] Edit frontend/src/pages/Careers.tsx: Replace "grow+" with "BT buddy"
 - [x] Edit frontend/src/pages/Home.tsx: Change "G+" to "BT Buddy" in chatbot button
 - [x] Edit frontend/src/components/Chatbot.tsx: Update chatbot names and messages
-- [ ] Commit all changes to git
+- [x] Commit all changes to git
