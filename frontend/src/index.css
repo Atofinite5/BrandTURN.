@@ -147,3 +147,23 @@ body {
 .transform-style-3d {
   transform-style: preserve-3d;
 }
+
+/* Smoke animation for footer brandTURN */
+@keyframes smoke-rise {
+  0% {
+    opacity: 0.8;
+    transform: translateY(0px) scale(0.5) rotate(0deg);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-20px) scale(1) rotate(10deg);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.5) rotate(20deg);
+    filter: blur(2px);
+  }
+}
+

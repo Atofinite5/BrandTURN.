@@ -1,7 +1,7 @@
 {
-  "name": "brandturn-|-grow+",
+  "name": "brandturn-|-bt-buddy",
   "version": "1.0.0",
-  "description": "Backend API for BrandTurn | Grow+",
+  "description": "Backend API for BrandTurn | BT buddy",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",

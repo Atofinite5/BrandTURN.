@@ -64,10 +64,10 @@ const generateAIResponse = async (data: any, promptType: 'reply' | 'summary' | '
 
 const getSystemPrompt = (type: string) => {
     switch(type) {
-        case 'reply': return `You are grow+ AI, the intelligent assistant for Grow+, a creative marketing agency. Write personalized, warm, and professional email replies. Keep responses concise but helpful. Sign off as "grow+ Team".`;
+        case 'reply': return `You are BT buddy AI, the intelligent assistant for BT buddy, a creative marketing agency. Write personalized, warm, and professional email replies. Keep responses concise but helpful. Sign off as "BT buddy Team".`;
         case 'summary': return `You are a data analyst. Provide concise, actionable insights.`;
         case 'market_research': return `You are a Market Research Expert. specific in finding leads and company data. You are helping a user search a database (Apollo.io).`;
-        default: return `You are grow+ AI, the intelligent assistant for Grow+.`;
+        default: return `You are BT buddy AI, the intelligent assistant for BT buddy.`;
     }
 }
 
@@ -218,7 +218,7 @@ const AdminDashboard: React.FC = () => {
       const reply = await generateAIResponse(emailContact, 'reply');
       setEmailBody(reply);
     } catch (error) {
-      alert('Failed to generate grow+ AI response. Please check your API configuration.');
+      alert('Failed to generate BT buddy AI response. Please check your API configuration.');
     } finally {
       setAiGenerating(false);
     }
@@ -283,7 +283,7 @@ const AdminDashboard: React.FC = () => {
         {/* Logo */}
         <div className="mb-10">
           <h1 className="text-2xl font-bold">
-            grow<span className="text-[#c9f31c]">+</span>
+            BT<span className="text-[#c9f31c]"> buddy</span>
           </h1>
           <p className="text-white/40 text-sm mt-1">Admin Panel</p>
         </div>
@@ -367,7 +367,7 @@ const AdminDashboard: React.FC = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            Grow+
+            BT buddy
           </button>
 
 
@@ -881,7 +881,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={handleApolloSearch}
+                      onClick={() => handleApolloSearch()}
                       disabled={isApolloLoading}
                       className="flex items-center gap-2 px-6 py-3 bg-[#c9f31c] text-black rounded-xl font-semibold hover:bg-[#b0d618] transition-all disabled:opacity-50"
                     >
@@ -1045,7 +1045,7 @@ const AdminDashboard: React.FC = () => {
           {activeTab === 'chatbot' && (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-2">Grow+ AI Assistant</h3>
+                <h3 className="text-2xl font-bold mb-2">BT buddy AI Assistant</h3>
                 <p className="text-white/60">Your intelligent assistant for emails, business ideas, marketing strategies, and more.</p>
               </div>
 
@@ -1171,8 +1171,8 @@ const AdminDashboard: React.FC = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">grow<span className="text-[#c9f31c]">+</span> AI Composer</h3>
-                    <p className="text-white/50 text-sm">Powered by grow+ AI</p>
+                    <h3 className="font-bold text-lg">BT<span className="text-[#c9f31c]"> buddy</span> AI Composer</h3>
+                    <p className="text-white/50 text-sm">Powered by BT buddy AI</p>
                   </div>
                 </div>
                 <button 
@@ -1234,14 +1234,14 @@ const AdminDashboard: React.FC = () => {
                     {aiGenerating ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        grow+ thinking...
+                        BT buddy thinking...
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        grow+ AI Reply
+                        BT buddy AI Reply
                       </>
                     )}
                   </button>
@@ -1253,7 +1253,7 @@ const AdminDashboard: React.FC = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    grow+ Insights
+                    BT buddy Insights
                   </button>
                 </div>
 
@@ -1318,7 +1318,7 @@ const AdminDashboard: React.FC = () => {
                     <svg className="w-5 h-5 text-[#c9f31c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    grow+ Insights
+                    BT buddy Insights
                   </h4>
                   <button 
                     onClick={() => setShowAiPanel(false)}
@@ -1333,7 +1333,7 @@ const AdminDashboard: React.FC = () => {
                   {aiGenerating ? (
                     <div className="flex flex-col items-center justify-center h-full text-center">
                       <div className="w-8 h-8 border-2 border-[#c9f31c] border-t-transparent rounded-full animate-spin mb-3"></div>
-                      <p className="text-white/60 text-sm">grow+ AI analyzing...</p>
+                      <p className="text-white/60 text-sm">BT buddy AI analyzing...</p>
                     </div>
                   ) : aiInsights ? (
                     <div className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">
@@ -1344,7 +1344,7 @@ const AdminDashboard: React.FC = () => {
                       <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
-                      <p className="text-sm">Click "grow+ Insights" to analyze this inquiry</p>
+                      <p className="text-sm">Click "BT buddy Insights" to analyze this inquiry</p>
                     </div>
                   )}
                 </div>

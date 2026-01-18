@@ -83,7 +83,7 @@ After deploying frontend, go back to Render and update:
 - [ ] CORS configured (FRONTEND_URL in backend)
 - [ ] Test login/signup functionality
 - [ ] Test contact form submission
-- [ ] Test Admin Dashboard with grow+ AI
+- [ ] Test Admin Dashboard with BT buddy AI
 
 ## Environment Variables Summary
 

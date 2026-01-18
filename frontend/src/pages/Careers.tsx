@@ -109,7 +109,7 @@ const Careers = () => {
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
               <div>
-                 <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">Why intern at grow+?</h2>
+                 <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">Why intern at BT buddy?</h2>
                  <p className="text-gray-400 max-w-md">More than just an internship. It's an initiation into the future of tech and creativity.</p>
               </div>
               <div className="flex gap-2">
@@ -200,7 +200,7 @@ const Careers = () => {
                      {[
                         {
                             title: "Engineering & Dev",
-                            desc: "Build scalable systems using Next.js, Node, and Cloud infrastructure. Architect the core of grow+.",
+                            desc: "Build scalable systems using Next.js, Node, and Cloud infrastructure. Architect the core of BT buddy.",
                             skills: ["React", "Typescript", "AWS", "Node.js"],
                             icon: Code,
                             color: "text-blue-400",
@@ -247,7 +247,7 @@ const Careers = () => {
         {/* Life at grow+ Gallery */}
         <section className="py-20 bg-[#0A0A0A] overflow-hidden">
             <div className="container mx-auto px-6 mb-12">
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">Life at grow+</h2>
+                <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">Life at BT buddy</h2>
                  <p className="text-gray-400">Collaboration, innovation, and occasional pizza parties.</p>
             </div>
             <div className="h-[600px] w-full relative cursor-grab active:cursor-grabbing">
