@@ -23,8 +23,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
-  const chatbotName = context === 'admin' ? 'BT buddy' : 'BT buddy';
-  const chatbotTitle = context === 'admin' ? 'BT buddy AI Assistant' : 'BT buddy - BrandTURN Executive Assistant';
+  // Branding: show "BT" in the circle and consistent title
+  const chatbotName = 'BT';
+  const chatbotTitle = 'BT buddy - BrandTURN Executive Assistant';
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -105,20 +106,29 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
     <div className="fixed bottom-4 right-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-80 h-[500px] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#c9f31c] to-[#a8e017] text-[#000000] p-4 rounded-t-2xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {chatbotName}
+        <div className="bg-black text-white p-3 rounded-t-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-shrink-0">
+              <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
+                {chatbotName}
+              </div>
+              <span className="block text-xs lowercase text-white/90 mt-1 text-center">buddy</span>
             </div>
-            <div>
-              <h3 className="font-semibold text-sm">{chatbotTitle}</h3>
-              <p className="text-xs opacity-80">Online</p>
+            <div className="ml-0">
+              <h3 className="font-semibold text-sm leading-tight">BT buddy - BrandTURN</h3>
+              <p className="text-xs text-white/80 mt-0.5">Executive Assistant</p>
+              <p className="text-xs opacity-80 text-white/80 mt-0.5">Online</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#000000] hover:bg-black/10 rounded-full p-1 transition-colors"
+            aria-label="Close chat"
+            className="text-white hover:bg-white/10 rounded-full p-1 transition-colors"
           >
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button> 
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -137,17 +147,17 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
               className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                className={`max-w-[80%] ${message.isUser ? 'ml-auto' : ''} p-3 rounded-2xl text-sm ${
                   message.isUser
-                    ? 'bg-[#c9f31c] text-black'
-                    : context === 'landing' ? 'bg-gray-100 text-gray-900' : 'bg-gray-100 text-gray-800'
-                }`}
+                    ? 'bg-black text-white rounded-3xl text-sm leading-normal'
+                    : 'bg-gray-100 text-gray-900 rounded-2xl text-sm leading-relaxed'
+                } shadow-sm`}
               >
                 <p className="whitespace-pre-wrap">{message.text}</p>
-                <p className={`text-xs mt-1 ${message.isUser ? 'text-black/60' : 'text-gray-500'}`}>
+                <p className={`text-xs mt-1 ${message.isUser ? 'text-white/70' : 'text-gray-500'}`}>
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
-              </div>
+              </div> 
             </div>
           ))}
 
@@ -174,18 +184,21 @@ const Chatbot: React.FC<ChatbotProps> = ({ context, isOpen, onClose }) => {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
+              aria-label="Type a message"
               placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9f31c] focus:border-transparent text-black placeholder-gray-500"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black/80 focus:border-transparent text-black placeholder-gray-500 bg-white"
               disabled={isTyping}
             />
             <button
               onClick={sendMessage}
+              aria-label="Send message"
               disabled={!inputMessage.trim() || isTyping}
-              className="bg-[#c9f31c] text-black p-2 rounded-full hover:bg-[#b8e01a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-black text-white p-2.5 w-10 h-10 rounded-full hover:bg-gray-800 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <svg className="w-4 h-4 transform rotate-90 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M22 2L11 13" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M22 2l-7 20-4-9-9-4 20-7z" />
               </svg>
             </button>
           </div>
