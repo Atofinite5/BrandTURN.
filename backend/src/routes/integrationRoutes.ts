@@ -31,23 +31,23 @@ router.post('/ai/chat', async (req, res) => {
 
         let systemPrompt = '';
         if (context === 'admin') {
-            systemPrompt = `You are Grow+, an intelligent AI assistant for BrandTURN's admin panel. You help with:
+            systemPrompt = `You are BT Buddy, an intelligent AI assistant for BrandTURN's admin panel. You help with:
 - Writing professional emails and communications
 - Generating business ideas and strategies
 - Marketing insights and campaign planning
 - Learning new marketing techniques and trends
 - Administrative tasks and productivity tips
-Always be helpful, professional, and provide actionable advice. Sign responses as "Grow+ AI Assistant".`;
+Always be helpful, professional, and provide actionable advice. Sign responses as "BT Buddy".`;
         } else if (context === 'landing') {
-            systemPrompt = `You are G+, the AI executive assistant for BrandTURN, a creative marketing agency. You help visitors with:
+            systemPrompt = `You are BT Buddy, the AI executive assistant for BrandTURN, a creative marketing agency. You help visitors with:
 - Understanding BrandTURN's services
 - Getting suggestions for their marketing needs
 - Redirecting to appropriate pages or contacts
 - Providing quick answers about digital marketing
 - Offering consultation guidance
-Be friendly, professional, and helpful. Always represent BrandTURN positively. Sign responses as "G+ - BrandTURN Executive Assistant".`;
+Be friendly, professional, and helpful. Always represent BrandTURN positively. Sign responses as "BT Buddy - BrandTURN Executive Assistant".`;
         } else {
-            systemPrompt = `You are a helpful AI assistant. Provide clear, concise, and accurate responses.`;
+            systemPrompt = `You are BT Buddy, a helpful AI assistant. Provide clear, concise, and accurate responses.`;
         }
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -84,7 +84,7 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
         // Provide context-specific fallback responses
         let fallbackMessage = '';
         if (context === 'admin') {
-            fallbackMessage = `I'm currently unable to process your request due to a technical issue. As Grow+ AI, I can help you with:
+            fallbackMessage = `I'm currently unable to process your request due to a technical issue. As BT Buddy, I can help you with:
 
 • Writing professional emails and responses
 • Generating business ideas and strategies
@@ -94,7 +94,7 @@ Be friendly, professional, and helpful. Always represent BrandTURN positively. S
 
 Please try again in a moment, or let me know how else I can assist you!`;
         } else if (context === 'landing') {
-            fallbackMessage = `I'm having trouble connecting right now. As G+, your BrandTURN executive assistant, I can help you with:
+            fallbackMessage = `I'm having trouble connecting right now. As BT Buddy, your BrandTURN executive assistant, I can help you with:
 
 • Understanding our marketing services
 • Getting suggestions for your business needs
@@ -115,8 +115,8 @@ Please try your question again, or feel free to explore our website for more inf
 router.post('/ai/generate', async (req, res) => {
     // If no Groq API key, return a helpful fallback
     if (!GROQ_API_KEY) {
-        return res.json({ 
-            content: `Strategy: Focus on decision-makers with budget authority in your target industry.\n\nKeywords: CEO, Marketing Director, VP Sales, Founder, Head of Growth` 
+        return res.json({
+            content: `Strategy: Focus on decision-makers with budget authority in your target industry.\n\nKeywords: CEO, Marketing Director, VP Sales, Founder, Head of Growth`
         });
     }
 
@@ -141,19 +141,19 @@ router.post('/ai/generate', async (req, res) => {
         });
 
         if (!response.ok) {
-             throw new Error(`Groq API Error: ${response.statusText}`);
+            throw new Error(`Groq API Error: ${response.statusText}`);
         }
-        
+
         const data: any = await response.json();
         const content = data.choices[0]?.message?.content || 'Unable to generate response';
-        
+
         res.json({ content });
 
     } catch (error: any) {
         console.error('Groq AI Error:', error.message);
         // Fallback response
-        res.json({ 
-            content: `Strategy: Target professionals in leadership roles within your specified industry.\n\nKeywords: Director, Manager, VP, C-Suite, Lead` 
+        res.json({
+            content: `Strategy: Target professionals in leadership roles within your specified industry.\n\nKeywords: Director, Manager, VP, C-Suite, Lead`
         });
     }
 });

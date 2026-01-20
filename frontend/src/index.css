@@ -19,7 +19,7 @@
   --background: #0a0a0a;
   --background-secondary: #111111;
   --foreground: #F1FFFA;
-  
+
   /* Section Background - Metallic Black */
   --section-bg: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
   --section-bg-alt: linear-gradient(180deg, #0a0a0a 0%, #151515 100%);
@@ -68,7 +68,7 @@ body {
   z-index: 1;
 }
 
-.section-dark > * {
+.section-dark>* {
   position: relative;
   z-index: 2;
 }
@@ -155,11 +155,13 @@ body {
     transform: translateY(0px) scale(0.5) rotate(0deg);
     filter: blur(0px);
   }
+
   50% {
     opacity: 0.6;
     transform: translateY(-20px) scale(1) rotate(10deg);
     filter: blur(1px);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-40px) scale(1.5) rotate(20deg);
@@ -167,3 +169,19 @@ body {
   }
 }
 
+/* Fade in animation for chatbot messages */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}

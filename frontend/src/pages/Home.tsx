@@ -38,7 +38,7 @@ const Home = () => {
 
   useEffect(() => {
     const hasSeenModal = localStorage.getItem('hasSeenAuthModal');
-    
+
     if (!user && !hasSeenModal) {
       const timer = setTimeout(() => {
         setIsAuthModalOpen(true);
@@ -64,14 +64,24 @@ const Home = () => {
         {/* Floating Chatbot Button */}
         <button
           onClick={() => setIsChatbotOpen(true)}
-          className="fixed bottom-6 right-6 bg-[#c9f31c] text-black p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-40 group"
-          aria-label="Open BT buddy"
+          className="fixed bottom-6 right-6 bg-black text-white p-0 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 z-40 group border-2 border-white overflow-hidden"
+          aria-label="Open BT Buddy"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-black text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Chat with BT buddy
+          <div className="flex items-center gap-3 px-4 py-3">
+            {/* BT Logo */}
+            <div className="w-10 h-10 bg-black border-2 border-white rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">BT</span>
+            </div>
+            {/* Text */}
+            <div className="text-left pr-2">
+              <div className="font-bold text-sm leading-tight">BT Buddy</div>
+              <div className="text-xs text-gray-300">Chat with us</div>
+            </div>
+          </div>
+          {/* Tooltip */}
+          <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
+            Chat with BT Buddy
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
           </div>
         </button>
 
