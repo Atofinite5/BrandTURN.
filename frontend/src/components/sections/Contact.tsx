@@ -373,7 +373,7 @@ Message: ${formData.message || 'N/A'}`,
                                 <Mail size={20} className="text-white" />
                             </div>
                             <p className="text-sm text-gray-500 mb-1">Email us</p>
-                            <a href="mailto:Brandturnofficial@gmail.com" className="font-semibold hover:underline" style={{ color: '#1a4d4d' }}>Brandturnofficial@gmail.com</a>
+                            <a href="mailto:Brandturnofficial@gmail.com" className="font-semibold hover:underline text-sm block break-all" style={{ color: '#1a4d4d', wordBreak: 'break-word', overflowWrap: 'break-word' }}>Brandturnofficial@gmail.com</a>
                         </div>
                         <div className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow text-center">
                             <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#1a4d4d' }}>
